@@ -1,5 +1,32 @@
 # SOPHIA ~ Python database based chatbot
 
+import console
+import time
+import os
+import shutil
+
+isDesktop = False
+spaceWindowAmount = 20
+
+def PrintWindowBorder(l):
+  i = 0
+  while i < l:
+    print("=", end = "")
+    i += 1
+  print("")
+
+def AddSpace(n):
+  i = 0
+  while i < n:
+    print("")
+    i = i+1
+
+def NewWindow():
+  if isDesktop == False:
+    console.clear()
+  else:
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def WriteAtTheEnd(s):
   f = open("sophiaDatabase.txt", "r+")
   f.seek(0)
@@ -55,6 +82,10 @@ def SearchForTag(tag):
   f.close()
   return lineIndexArray
 
+def ShowHelpCommands():
+  print("help:  Mostra tutti i comandi sviluppatore")
+  print("learn: Effettua il training di Sophia")
+
 def WriteOnDatabase():
   title = input("Titolo: ")
   print("Inserisci le informazioni riguardo l'argomento:")
@@ -63,7 +94,21 @@ def WriteOnDatabase():
   tags = input()
 
   # DATA STRUCTURE
-  newData = tags + "_" + title + "_" + data + "/"
+  newData = tags + "_" + title + "_" + data + "_"
   WriteAtTheEnd(newData + "\n")
 
-print(SearchForTag("nicola"))
+def main():
+  while True:
+    NewWindow()
+    print("Ciao, sono Sophia!")
+    print("In cosa posso aiutarti oggi?")
+    print("\n\n")
+    question = input()
+    NewWindow()
+    
+    if question == "help":
+      ShowHelpCommands()
+    elif question == "learn":
+      WriteOnDatabase()
+
+main()
