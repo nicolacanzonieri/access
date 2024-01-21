@@ -4,22 +4,10 @@ import console
 import time
 import os
 import shutil
+import re
 
 isDesktop = False
 spaceWindowAmount = 20
-
-def PrintWindowBorder(l):
-  i = 0
-  while i < l:
-    print("=", end = "")
-    i += 1
-  print("")
-
-def AddSpace(n):
-  i = 0
-  while i < n:
-    print("")
-    i = i+1
 
 def NewWindow():
   if isDesktop == False:
@@ -27,8 +15,76 @@ def NewWindow():
   else:
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def IdentifyTags():
-  stop_words = ["la", "il", "i", "gli", "le", "a", "da", "in", "su", "per", "con", "di", "e", "o", "ma", "che", "se", "questo", "quello", "questa", "quella", "i", "gli", "le", "questi", "quelle", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci", "cento", "mille", "mezzo", "primo", "secondo", "terzo", "quarto", "quinto", "sesto", "settimo", "ottavo", "nono", "decimo", "centocinquanta", "duecento", "trecento", "quattrocento", "cinquecento", "seicento", "settecento", "ottocento", "novecento", "mille", "milleuno", "milledue", "milletre", "millequattro", "millecinque", "millesei", "millesette", "milleotto", "millenove", "milledieci", "millecento", "milleduecento", "milletrecento", "millequattrocento", "millecinquecento", "milleseicento", "millesettecento", "milleottocento", "millenovecento", "duemila", "duemilauno", "duemiladue", "duemilatre", "duemilaquattro", "duemilacinque", "duemilasei", "duemilasette", "duemilaotto", "duemilanove", "duemiladieci", "duemilacento", "duemiladuecento", "duemilatrecento", "duemilaquattrocento", "duemilacinquecento", "duemilaseicento", "duemilasettecento", "duemilaottocento", "millenovecento", "tremila", "tremilauno", "tremiladue", "tremilatre", "tremilaquattro", "tremilacinque", "tremilasei", "tremilasette", "tremilaotto", "tremilanove", "tremiladieci", "tremilacento", "tremiladuecento", "tremilatrecento", "tremilaquattrocento", "tremilacinquecento", "tremilaseicento", "tremilasettecento", "tremilaottocento", "tremilanovecento", "io", "tu", "lui", "lei", "noi", "voi", "loro", "mio", "tuo", "suo", "suo", "nostro", "vostro", "loro", "questo", "quello", "questa", "quella", "questi", "quelli", "queste", "quelle", "chi", "che", "quale", "quanto", "dove", "quando", "perché", "che", "quale", "quale", "quali", "quali", "di", "in", "su", "per", "con", "di", "e", "o", "ma", "se", "grande", "piccolo", "alto", "basso", "lungo", "corto", "grosso", "sottile", "bello", "brutto", "buono", "cattivo", "nuovo", "vecchio", "caldo", "freddo", "chiaro", "scuro", "vicino", "lontano", "sopra", "sotto", "davanti", "dietro", "destra", "sinistra", "dentro", "fuori", "qui", "là", "ora", "prima", "poi", "dopo", "oggi", "domani", "ieri", "sempre", "mai", "spesso", "raramente", "presto", "tardi", "essere", "avere", "fare", "andare", "venire", "dire", "vedere", "sentire", "pensare", "volere", "potere", "sapere", "amare", "odiare", "temere", "sperare", "credere", "sognare", "desiderare", "provare", "piangere", "ridere", "cantare", "ballare"]
+def DetectTags(str):
+  words = str.split()
+  regex = r"^[a-zA-Z0-9]+$"
+  for word in words:
+    if not re.match(regex, word):
+      words.remove(word)
+    
+  return OptimizeTags(words)
+
+def OptimizeTags(str_array):
+  i = 0
+  f = open("stop_words.txt", "r+")
+  
+  while i < len(str_array):
+    f.seek(0)
+    line = f.readline()
+    
+    while line:
+      line = line.strip()
+      if not line:
+        break
+      if str_array[i].lower() == line.lower():
+        str_array.pop(i)
+        i -=1
+        if len(str_array) == 0:
+          break
+      line = f.readline()
+    
+    i += 1
+  
+  f.close()
+  
+  i = 0
+  while i < len(str_array):
+    str_array[i] = str_array[i].lower()
+    i += 1
+  
+  return str_array
+
+def RemovePunctuation(str):
+  i = 0
+  
+  while i < len(str):
+    if ord(str[i:i+1]) >= 33 and ord(str[i:i+1]) <= 47:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 58 and ord(str[i:i+1]) <= 63:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 91 and ord(str[i:i+1]) <= 96:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 123 and ord(str[i:i+1]) <= 126:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+      
+    i += 1
+  
+  return str
+
+def BuildTags(tag_array):
+  tags = ""
+  i = 0
+  
+  while i < len(tag_array):
+    tags = tags + tag_array[i] + "/"
+    i += 1
+  
+  tags = tags[:len(tags)-1]
+  return tags
 
 def WriteAtTheEnd(s):
   f = open("sophiaDatabase.txt", "r+")
@@ -86,15 +142,15 @@ def SearchForTag(tag):
   return lineIndexArray
 
 def ShowHelpCommands():
-  print("help:  Mostra tutti i comandi sviluppatore")
-  print("learn: Effettua il training di Sophia")
+  print("help:  Show developer commands")
+  print("learn: Train Sophia")
 
 def WriteOnDatabase():
-  title = input("Titolo: ")
+  print("Titolo argomento:")
+  title = input()
   print("Inserisci le informazioni riguardo l'argomento:")
   data = input()
-  print("Inserisci i tags (separa un tag dall'altro con '/' es. cucina/pranzo/natale)")
-  tags = input()
+  tags = BuildTags(DetectTags(RemovePunctuation(data)))
 
   # DATA STRUCTURE
   newData = tags + "_" + title + "_" + data + "_"
@@ -113,5 +169,7 @@ def main():
       ShowHelpCommands()
     elif question == "learn":
       WriteOnDatabase()
+    elif question == "test":
+      IdentifyTags("questa è una prova")
 
 main()
