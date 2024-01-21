@@ -141,27 +141,28 @@ def SearchForTag(tag):
   f.close()
   return lineIndexArray
 
+def NormalizeStrings():
+    accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
+    with open("source.txt", 'r', encoding='utf-8') as f:
+        text = f.read()
+        print(text)
+        for char in accented_chars:
+            text = text.replace(char, accented_chars[char])
+    return text
+
 def ReadSource():
   data = ["", ""]
   f = open("source.txt", "r")
   f.seek(0)
   line = f.readline()
   line.strip()
+  
   data[0] = line # TITLE
   data[0] = data[0].strip()
   
-  line = f.readline()
+  data[1] = NormalizeStrings()
   
-  str = ""
-  
-  while line:
-    line = line.strip()
-    if not line:
-      break
-    str += line
-    line = f.readline()
-  
-  data[1] = str
+  f.close()
   
   return data
 
