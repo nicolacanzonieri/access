@@ -141,20 +141,48 @@ def SearchForTag(tag):
   f.close()
   return lineIndexArray
 
+def ReadSource():
+  data = ["", ""]
+  f = open("source.txt", "r")
+  f.seek(0)
+  line = f.readline()
+  line.strip()
+  data[0] = line # TITLE
+  data[0] = data[0].strip()
+  
+  line = f.readline()
+  
+  str = ""
+  
+  while line:
+    line = line.strip()
+    if not line:
+      break
+    str += line
+    line = f.readline()
+  
+  data[1] = str
+  
+  return data
+
 def ShowHelpCommands():
   print("help:  Show developer commands")
   print("learn: Train Sophia")
 
-def WriteOnDatabase():
-  print("Titolo argomento:")
-  title = input()
-  print("Inserisci le informazioni riguardo l'argomento:")
-  data = input()
+def WriteOnDatabase(data_array):
+  title = data_array[0]
+  data = data_array[1]
   tags = BuildTags(DetectTags(RemovePunctuation(data)))
 
   # DATA STRUCTURE
   newData = tags + "_" + title + "_" + data + "_"
   WriteAtTheEnd(newData + "\n")
+
+def Train():
+  data_array = ReadSource()
+  WriteOnDatabase(data_array)
+  print("Done!")
+  input()
 
 def main():
   while True:
@@ -168,8 +196,11 @@ def main():
     if question == "help":
       ShowHelpCommands()
     elif question == "learn":
-      WriteOnDatabase()
-    elif question == "test":
-      IdentifyTags("questa è una prova")
+      Train()
+    elif question == "find":
+      tag = input("TAG: ")
+      NewWindow()
+      print(SearchForTag(tag))
+      input()
 
 main()
