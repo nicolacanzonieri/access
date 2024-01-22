@@ -2,6 +2,8 @@
 
 - Database management:
     - [ ] Add better database structure
-    - [ ] Add find best result function to Sophia's code
-    - [ ] Add answer function to Sophia
+        - [ ] Add better answer visualization 
+    - [X] Add find best result function to Sophia's code
+    - [X] Add answer function to Sophia
     - [X] Create folder only for database
+    - [ ] Find a way to give tags more weight than others
