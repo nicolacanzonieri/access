@@ -6,7 +6,7 @@ import os
 import shutil
 import re
 
-isDesktop = True
+isDesktop = False
 spaceWindowAmount = 20
 
 def NewWindow():
@@ -14,19 +14,64 @@ def NewWindow():
     console.clear()
   else:
     os.system('cls' if os.name == 'nt' else 'clear')
-
-def DetectTags(str):
-  words = str.split()
-  regex = r"^[a-zA-Z0-9]+$"
-  for word in words:
-    if not re.match(regex, word):
-      words.remove(word)
     
-  return OptimizeTags(words)
+def ReadAndNormalize():
+  accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
+  with open("source.txt", 'r', encoding='utf-8') as f:
+    text = f.read()
+    for char in accented_chars:
+      text = text.replace(char, accented_chars[char])
+  return text
+
+def FindTitleAndData(text):
+  title = ""
+  i = 0
+  while i < len(text):
+    if text[i:i+1] == "\n":
+      break
+    else:
+      title += text[i:i+1]
+      i = i + 1
+   
+  data = text[i:]
+  data_array = [title, data]
+  return data_array
+
+def RemoveLineFeed(data):
+  i = 0
+  while i < len(data):
+    if data[i:i+1] == "\n":
+      data = data.replace(data[i:i+1], '', 1)
+      i = i - 1
+    else:
+      i = i + 1
+
+  return data
+
+def RemovePunctuation(str):
+  i = 0
+  
+  while i < len(str):
+    if ord(str[i:i+1]) >= 33 and ord(str[i:i+1]) <= 47:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 58 and ord(str[i:i+1]) <= 63:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 91 and ord(str[i:i+1]) <= 96:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+    elif ord(str[i:i+1]) >= 123 and ord(str[i:i+1]) <= 126:
+      str = str.replace(str[i:i+1], '', 1)
+      i -= 1
+      
+    i += 1
+  
+  return str
 
 def OptimizeTags(str_array):
   i = 0
-  f = open("stop_words.txt", "r+")
+  f = open("stop_words.txt", "r+", encoding = "utf-8")
   
   while i < len(str_array):
     f.seek(0)
@@ -54,26 +99,14 @@ def OptimizeTags(str_array):
   
   return str_array
 
-def RemovePunctuation(str):
-  i = 0
-  
-  while i < len(str):
-    if ord(str[i:i+1]) >= 33 and ord(str[i:i+1]) <= 47:
-      str = str.replace(str[i:i+1], '', 1)
-      i -= 1
-    elif ord(str[i:i+1]) >= 58 and ord(str[i:i+1]) <= 63:
-      str = str.replace(str[i:i+1], '', 1)
-      i -= 1
-    elif ord(str[i:i+1]) >= 91 and ord(str[i:i+1]) <= 96:
-      str = str.replace(str[i:i+1], '', 1)
-      i -= 1
-    elif ord(str[i:i+1]) >= 123 and ord(str[i:i+1]) <= 126:
-      str = str.replace(str[i:i+1], '', 1)
-      i -= 1
-      
-    i += 1
-  
-  return str
+def DetectTags(str):
+  words = str.split()
+  regex = r"^[a-zA-Z0-9]+$"
+  for word in words:
+    if not re.match(regex, word):
+      words.remove(word)
+    
+  return OptimizeTags(words)
 
 def BuildTags(tag_array):
   tags = ""
@@ -87,7 +120,7 @@ def BuildTags(tag_array):
   return tags
 
 def WriteAtTheEnd(s):
-  f = open("sophiaDatabase.txt", "r+")
+  f = open("sophiaDatabase.txt", "r+", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   while line:
@@ -113,7 +146,7 @@ def SearchForTag(tag):
   lineIndexArray = []
   lineIndex = 0
   
-  f = open("sophiaDatabase.txt", "r")
+  f = open("sophiaDatabase.txt", "r",  encoding = "utf-8")
   f.seek(0)
   line = f.readline()
 
@@ -141,43 +174,6 @@ def SearchForTag(tag):
   f.close()
   return lineIndexArray
 
-def ReadAndNormalize():
-    accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
-    with open("source.txt", 'r', encoding='utf-8') as f:
-        text = f.read()
-        for char in accented_chars:
-            text = text.replace(char, accented_chars[char])
-    return text
-
-def DetectTitleAndData(text):
-    title = ""
-    i = 0
-    while i < len(text):
-        if text[i:i+1] == "\n":
-            break
-        else:
-            title += text[i:i+1]
-        i = i + 1
-
-    data = text[i:]
-    data_array = [title, data]
-    return data_array
-
-def StripData(data):
-    i = 0
-    while i < len(data):
-        if data[i:i+1] == "\n":
-            data = data.replace(data[i:i+1], '', 1)
-            i = i - 1
-        else:
-            i = i + 1
-
-    return data
-
-def ShowHelpCommands():
-  print("help:  Show developer commands")
-  print("learn: Train Sophia")
-
 def WriteOnDatabase(data_array):
   title = data_array[0]
   data = data_array[1]
@@ -188,13 +184,20 @@ def WriteOnDatabase(data_array):
   WriteAtTheEnd(newData + "\n")
 
 def Train():
-  data = ReadAndNormalize()
-  data_array = DetectTitleAndData(data)
-  data_array[0] = StripData(data_array[0])
-  data_array[1] = StripData(data_array[1])
-  WriteOnDatabase(data_array)
-  print("Done!")
+  text = ReadAndNormalize()
+  data_array = FindTitleAndData(text)
+  data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
+  data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
+  tags = BuildTags(DetectTags(RemovePunctuation(data_array[1])))
+  
+  newData = tags + "_" + data_array[0] + "_" + data_array[1] + "_"
+  WriteAtTheEnd(newData)
+  print("Data saved on database!")
   input()
+
+def ShowHelpCommands():
+  print("help:  Show developer commands")
+  print("learn: Train Sophia")
 
 def main():
   while True:
