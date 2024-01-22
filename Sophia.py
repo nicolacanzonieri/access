@@ -1,4 +1,4 @@
-# SOPHIA ~ Python database based chatbot
+# SOPHIA ~ Python database based bot
 
 import console
 import time
@@ -15,9 +15,34 @@ def NewWindow():
   else:
     os.system('cls' if os.name == 'nt' else 'clear')
     
-def ReadAndNormalize():
+def InitializeSophiaSearchArray(database_dir):
+  results_array = []
+  
+  f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+  f.seek(0)
+  line = f.readline()
+  number_of_lines = 0
+  
+  while line:
+    line = line.strip()
+    if not line:
+      break
+    else:
+      number_of_lines += 1
+    line = f.readline()
+      
+  f.close()
+  
+  i = 0
+  while i < number_of_lines:
+    results_array.extend([0])
+    i += 1
+    
+  return results_array
+    
+def ReadAndNormalize(database_dir):
   accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
-  with open("source.txt", 'r', encoding='utf-8') as f:
+  with open(database_dir + "source.txt", 'r', encoding='utf-8') as f:
     text = f.read()
     for char in accented_chars:
       text = text.replace(char, accented_chars[char])
@@ -69,9 +94,9 @@ def RemovePunctuation(str):
   
   return str
 
-def OptimizeTags(str_array):
+def OptimizeTags(str_array, database_dir):
   i = 0
-  f = open("stop_words.txt", "r+", encoding = "utf-8")
+  f = open(database_dir + "stop_words.txt", "r+", encoding = "utf-8")
   
   while i < len(str_array):
     f.seek(0)
@@ -99,14 +124,14 @@ def OptimizeTags(str_array):
   
   return str_array
 
-def DetectTags(str):
+def DetectTags(str, database_dir):
   words = str.split()
   regex = r"^[a-zA-Z0-9]+$"
   for word in words:
     if not re.match(regex, word):
       words.remove(word)
     
-  return OptimizeTags(words)
+  return OptimizeTags(words, database_dir)
 
 def BuildTags(tag_array):
   tags = ""
@@ -119,8 +144,8 @@ def BuildTags(tag_array):
   tags = tags[:len(tags)-1]
   return tags
 
-def WriteAtTheEnd(s):
-  f = open("sophiaDatabase.txt", "r+", encoding = "utf-8")
+def WriteAtTheEnd(s, database_dir):
+  f = open(database_dir + "sophiaDatabase.txt", "r+", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   while line:
@@ -130,6 +155,18 @@ def WriteAtTheEnd(s):
     line = f.readline()
   f.write(s + "\n")
   f.close()
+  
+def Train(database_dir):
+  text = ReadAndNormalize(database_dir)
+  data_array = FindTitleAndData(text)
+  data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
+  data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
+  tags = BuildTags(DetectTags(RemovePunctuation(data_array[1]),database_dir))
+  
+  newData = tags + "_" + data_array[0] + "_" + data_array[1] + "_"
+  WriteAtTheEnd(newData, database_dir)
+  print("Data saved on database!")
+  input()
 
 def CompareStrings(s1, s2):
   if len(s1) != len(s2):
@@ -142,11 +179,11 @@ def CompareStrings(s1, s2):
       i += 1
     return True
 
-def SearchForTag(tag):
+def SearchForTag(tag, database_dir):
   lineIndexArray = []
   lineIndex = 0
   
-  f = open("sophiaDatabase.txt", "r",  encoding = "utf-8")
+  f = open(database_dir + "sophiaDatabase.txt", "r",  encoding = "utf-8")
   f.seek(0)
   line = f.readline()
 
@@ -173,34 +210,60 @@ def SearchForTag(tag):
 
   f.close()
   return lineIndexArray
-
-def WriteOnDatabase(data_array):
-  title = data_array[0]
-  data = data_array[1]
-  tags = BuildTags(DetectTags(RemovePunctuation(data)))
-
-  # DATA STRUCTURE
-  newData = tags + "_" + title + "_" + data + "_"
-  WriteAtTheEnd(newData + "\n")
-
-def Train():
-  text = ReadAndNormalize()
-  data_array = FindTitleAndData(text)
-  data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
-  data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
-  tags = BuildTags(DetectTags(RemovePunctuation(data_array[1])))
   
-  newData = tags + "_" + data_array[0] + "_" + data_array[1] + "_"
-  WriteAtTheEnd(newData)
-  print("Data saved on database!")
-  input()
+def FindBestResult(tag_lines, results_array):
+  i = 0
+  while i < len(tag_lines):
+    results_array[tag_lines[i]] += 1
+    i += 1
+  
+  i = 0
+  best_index = 0
+  while i < len(results_array):
+    if results_array[i] > results_array[best_index]:
+      best_index = i
+    i += 1
+  
+  return best_index
+
+def PrintAnswer(question, results_array, database_dir):
+  question = RemovePunctuation(question)
+  question_tags = question.split()
+  print("Question tags: ", end = "")
+  print(question_tags)
+  tag_lines_temp = []
+  tag_lines = []
+  
+  i = 0
+  while i < len(question_tags):
+    search_result = SearchForTag(question_tags[i].lower(), database_dir)
+    tag_lines.extend(search_result)
+    if len(search_result) != 0:
+      tag_lines_temp.append(search_result)
+    i += 1
+  
+  print("\nResults: ", end = "")
+  print(tag_lines, end = "")
+  print(" <- Argument for FindBestResult")
+  print("Results for tag: ", end = "")
+  print(tag_lines_temp)
+  print("\n\n\n")
+  
+  best_result = FindBestResult(tag_lines, results_array)
+  print("Best answer: " + str(best_result))
 
 def ShowHelpCommands():
   print("help:  Show developer commands")
   print("learn: Train Sophia")
 
 def main():
+  current_dir = os.getcwd()
+  database_dir = current_dir + "/database/"
+  
+  results_array = []
+  
   while True:
+    results_array = InitializeSophiaSearchArray(database_dir)
     NewWindow()
     print("Ciao, sono Sophia!")
     print("In cosa posso aiutarti oggi?")
@@ -211,11 +274,14 @@ def main():
     if question == "help":
       ShowHelpCommands()
     elif question == "learn":
-      Train()
+      Train(database_dir)
     elif question == "find":
       tag = input("TAG: ")
       NewWindow()
-      print(SearchForTag(tag))
+      print(SearchForTag(tag, database_dir))
+      input()
+    else: # The user asked a question to Sophia...
+      PrintAnswer(question, results_array, database_dir)
       input()
 
 main()
