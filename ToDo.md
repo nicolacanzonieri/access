@@ -6,4 +6,6 @@
     - [X] Add find best result function to Sophia's code
     - [X] Add answer function to Sophia
     - [X] Create folder only for database
-    - [ ] Find a way to give tags more weight than others
+    - [ ] Create Super Tags!
+    - [ ] Create Common Tags!
+    - [ ] Add the possibility to show all the answers 
