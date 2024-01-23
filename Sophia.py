@@ -6,7 +6,7 @@ import os
 import shutil
 import re
 
-isDesktop = False
+isDesktop = True
 spaceWindowAmount = 20
 
 def NewWindow():
@@ -383,13 +383,11 @@ def main():
     
     if question == "help":
       ShowHelpCommands()
+      input()
     elif question == "learn":
       Train(database_dir)
     elif question == "learn tags":
       TrainTags(database_dir)
-    elif question == "test":
-      tags_array = input("> ")
-      RemoveDuplicateTags(tags_array)
     else: # The user asked a question to Sophia...
       Answer(question, results_array, database_dir)
       input()
