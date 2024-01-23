@@ -1,4 +1,9 @@
-# SOPHIA ~ Python database based bot
+'''
+S.O.P.H.I.A.
+Software for Organizing Personalized History with Intelligent Advice
+~
+Created by Nicola Canzonieri
+'''
 
 import console
 import time
