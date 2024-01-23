@@ -125,14 +125,19 @@ def OptimizeTags(str_array, database_dir):
   return str_array
   
 def RemoveDuplicateTags(tags_array):
+  #print(tags_array)
   i = 0
   while i < (len(tags_array) - 2):
     j  = i + 1
     while j < len(tags_array):
-      if tags_array[i] == tags_array[j]:
-        tags_array.pop(j)
-        j -= 1
-      else:
+      #print(str(i) + " - " + str(j) + " - " + str(len(tags_array))) #33 - 32 dove spunta l'errore
+      try:
+        if tags_array[i] == tags_array[j]:
+          tags_array.pop(j)
+          j -= 1
+        else:
+          j += 1
+      except:
         j += 1
     i += 1
   return tags_array
