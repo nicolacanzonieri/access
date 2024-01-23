@@ -42,7 +42,7 @@ def InitializeSophiaSearchArray(database_dir):
     
 def ReadAndNormalize(database_dir):
   accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
-  with open(database_dir + "source.txt", 'r', encoding='utf-8') as f:
+  with open("source.txt", 'r', encoding='utf-8') as f:
     text = f.read()
     for char in accented_chars:
       text = text.replace(char, accented_chars[char])
