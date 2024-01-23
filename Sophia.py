@@ -123,6 +123,19 @@ def OptimizeTags(str_array, database_dir):
     i += 1
   
   return str_array
+  
+def RemoveDuplicateTags(tags_array):
+  i = 0
+  while i < (len(tags_array) - 2):
+    j  = i + 1
+    while j < len(tags_array):
+      if tags_array[i] == tags_array[j]:
+        tags_array.pop(j)
+        j -= 1
+      else:
+        j += 1
+    i += 1
+  return tags_array
 
 def DetectTags(str, database_dir):
   words = str.split()
@@ -130,7 +143,8 @@ def DetectTags(str, database_dir):
   for word in words:
     if not re.match(regex, word):
       words.remove(word)
-    
+  
+  words = RemoveDuplicateTags(words)
   return OptimizeTags(words, database_dir)
 
 def BuildTags(tag_array):
@@ -144,6 +158,18 @@ def BuildTags(tag_array):
   tags = tags[:len(tags)-1]
   return tags
 
+def WriteStopWordsAtTheEnd(s, database_dir):
+  f = open(database_dir + "stop_words.txt", "r+", encoding = "utf-8")
+  f.seek(0)
+  line = f.readline()
+  while line:
+    line = line.strip()
+    if not line:
+      break
+    line = f.readline()
+  f.write(s + "\n")
+  f.close()
+
 def WriteAtTheEnd(s, database_dir):
   f = open(database_dir + "sophiaDatabase.txt", "r+", encoding = "utf-8")
   f.seek(0)
@@ -155,6 +181,39 @@ def WriteAtTheEnd(s, database_dir):
     line = f.readline()
   f.write(s + "\n")
   f.close()
+
+def LearnTags(tag, tag_array, database_dir):
+  i = 0
+  while i < len(tag_array):
+    if CompareStrings(tag, tag_array[i]):
+      WriteStopWordsAtTheEnd(tag, database_dir)
+      tag_array.pop(i)
+      i -= 1
+      break
+    
+    i += 1
+  
+  return tag_array
+
+def TrainTags(database_dir):
+  text = ReadAndNormalize(database_dir)
+  data_array = FindTitleAndData(text)
+  data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
+  data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
+  tag_array = DetectTags(RemovePunctuation(data_array[1]), database_dir)
+  while True:
+    NewWindow()
+    print("I have found this tags in the source file:\n")
+    print("TAGS: ", end = "")
+    print(tag_array)
+    print("\n\n\n")
+    answer = input("Insert tag to remove or !end! to quit: ")
+    
+    if answer == "!end!":
+      print("\n\n\nend")
+      break
+    else:
+      tag_array = LearnTags(answer, tag_array, database_dir)
   
 def Train(database_dir):
   text = ReadAndNormalize(database_dir)
@@ -226,35 +285,86 @@ def FindBestResult(tag_lines, results_array):
   
   return best_index
 
-def PrintAnswer(question, results_array, database_dir):
+def PrintResult(data):
+  i = 0
+  cont = 0
+  get_title = False
+  get_data = False
+  title = ""
+  result = ""
+  
+  while i < len(data):
+    if get_title:
+      title += data[i:i+1]
+    if get_data:
+      result += data[i:i+1]
+    
+    if data[i:i+1] == "_" and cont == 0:
+      cont = 1
+      get_title = True
+      get_data = False
+    elif data[i:i+1] == "_" and cont == 1:
+      cont = 2
+      get_title = False
+      get_data = True
+    elif data[i:i+1] == "_" and cont == 2:
+      cont = 0
+      get_title = False
+      get_data = False
+    i += 1
+  
+  print(title[:len(title)-1] + "\n")
+  print(result[:len(result)-1])
+
+def Answer(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
-  print("Question tags: ", end = "")
-  print(question_tags)
   tag_lines_temp = []
   tag_lines = []
   
   i = 0
   while i < len(question_tags):
     search_result = SearchForTag(question_tags[i].lower(), database_dir)
-    tag_lines.extend(search_result)
+    tag_lines_temp.append(search_result)
     if len(search_result) != 0:
-      tag_lines_temp.append(search_result)
-    i += 1
-  
-  print("\nResults: ", end = "")
-  print(tag_lines, end = "")
-  print(" <- Argument for FindBestResult")
-  print("Results for tag: ", end = "")
-  print(tag_lines_temp)
-  print("\n\n\n")
+      tag_lines.extend(search_result)
+    i += 1 
   
   best_result = FindBestResult(tag_lines, results_array)
-  print("Best answer: " + str(best_result))
+  
+  f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+  f.seek(0)
+  line = f.readline()
+  
+  i = 0
+  while i < len(results_array):
+    line = line.strip()
+    if i == best_result:
+      PrintResult(line)
+      break
+    else:
+      i += 1
+      line = f.readline()
+  
+  print("\n\n\n\n")
+  print("Your question produced this tags:")
+  print(question_tags)
+  print("\n")
+  print("Database lines: ")
+  print(tag_lines)
+  print("\n")
+  print("Database lines (more specified): ")
+  print(tag_lines_temp)
+  print("\n")
+  print("Database best answer: " + str(best_result))
 
 def ShowHelpCommands():
-  print("help:  Show developer commands")
-  print("learn: Train Sophia")
+  print("This are the developer commands that allows you to fully interact with me!")
+  print("For example you can access my whole database or you can allows me to learn new things\n")
+  print("Remember to use this functions only when you know what are you doing!\n\n\n")
+  print("help:       Show developer commands")
+  print("learn:      Train Sophia's database'")
+  print("learn tags: Train Sophia's tags identification")
 
 def main():
   current_dir = os.getcwd()
@@ -275,13 +385,13 @@ def main():
       ShowHelpCommands()
     elif question == "learn":
       Train(database_dir)
-    elif question == "find":
-      tag = input("TAG: ")
-      NewWindow()
-      print(SearchForTag(tag, database_dir))
-      input()
+    elif question == "learn tags":
+      TrainTags(database_dir)
+    elif question == "test":
+      tags_array = input("> ")
+      RemoveDuplicateTags(tags_array)
     else: # The user asked a question to Sophia...
-      PrintAnswer(question, results_array, database_dir)
+      Answer(question, results_array, database_dir)
       input()
 
 main()
