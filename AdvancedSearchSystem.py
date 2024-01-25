@@ -190,10 +190,8 @@ def PrintResult(data):
 def Answer(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
-  
-  SearchForSuperTag(question_tags, database_dir, len(results_array))
-  
-  '''Classic search algorithm'''
+    
+  '''OG search algorithm'''
   tag_lines_temp = []
   tag_lines = []
   
@@ -234,10 +232,79 @@ def Answer(question, results_array, database_dir):
   print("Database best answer: " + str(best_result))
 
 '''New Answer Engine powered by SuperTags'''
-def AnswerEngine(results_array, database_dir):
+def AnswerEngine(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
-  super_tag_index = SearchForSuperTag(quesiton_tags, database_dir, len(results_array))
+
+  try:
+    super_tag_index = SearchForSuperTag(question_tags, database_dir, len(results_array))
+  except:
+    super_tag_index = -1
+
+  if super_tag_index != -1:
+    f = open(database_dir + "supertags.txt", "r", encoding = "utf-8")
+    f.seek(0)
+    line = f.readline()
+    
+    i = 0
+    while i <= super_tag_index:
+      line = line.strip()
+      if i == super_tag_index:
+        break
+      line = f.readline()
+      i += 1
+    f.close()
+
+    super_tag_array = line.split()
+
+    print(str(super_tag_index) + ": ", end = "")
+    print(super_tag_array)
+
+    '''
+    Search if there are other relevants tags in the question
+    '''
+    other_tags_found = False
+    
+    i = 0
+    while i < len(question_tags):
+      if len(SearchForTag(question_tags[i].lower(), database_dir)) > 0:
+        j = 0
+        while j < len(super_tag_array):
+          if question_tags[i].lower() == super_tag_array[j]:
+            other_tags_found = True
+            break
+          j += 1
+      i += 1
+
+    if other_tags_found:
+      Answer(question, results_array, database_dir)
+    else:
+      print("Super tag found at line: " + str(super_tag_index) + "\n\n\n")
+      f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+      f.seek(0)
+      line = f.readline()
+      
+      i = 0
+      while i < len(results_array):
+        line = line.strip()
+        if i == super_tag_index:
+          PrintResult(line)
+          break
+        else:
+          i += 1
+          line = f.readline()
+      
+      print("\n\n\n\n")
+      print("Your question produced this tags:")
+      print(question_tags)
+      print("\n")
+      print("Database lines: ")
+      print(super_tag_array)
+      print("\n")
+      print("Database best answer: " + str(super_tag_index))
+    
+  else:
+    Answer(question, results_array, database_dir)
 
 def main(results_array, database_dir):
   results_array = InitializeSophiaSearchArray(database_dir)
@@ -247,10 +314,8 @@ def main(results_array, database_dir):
 
 def main_test(results_array, database_dir):
   results_array = InitializeSophiaSearchArray(database_dir)
-  question = input("> ")
-  question = RemovePunctuation(question)
-  question_tags = question.split()
-  SearchForSuperTag(question_tags, database_dir, len(results_array))
+  question = input("Insert question: ")
+  AnswerEngine(question, results_array, database_dir)
 
 current_dir = os.getcwd()
 database_dir = current_dir + "/database/"

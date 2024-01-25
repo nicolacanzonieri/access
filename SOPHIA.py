@@ -248,6 +248,57 @@ def CompareStrings(s1, s2):
       i += 1
     return True
 
+def SearchForSuperTag(question_tags, database_dir, database_len):
+  super_tag_found = False
+  
+  f = open(database_dir + "supertags.txt", "r", encoding = "utf-8")
+  f.seek(0)
+  line = f.readline()
+  
+  i = 0
+  while i < database_len:
+    line = line.strip()
+    super_tag = line.split()
+    
+    j = 0
+    while j < len(question_tags):
+      if CompareStrings(question_tags[j].lower(), super_tag[0]):
+        h = 1
+        while h < len(super_tag):
+          tag_found = False
+          
+          k = 0
+          while k < len(question_tags):
+            if CompareStrings(question_tags[k].lower(), super_tag[h]):
+              tag_found = True
+              break
+            k += 1
+          
+          if not tag_found:
+            break
+          
+          h += 1
+        
+        if h >= len(super_tag):
+           super_tag_found = True
+          
+      if super_tag_found:
+        break
+      j += 1
+    
+    if super_tag_found:
+      break
+    
+    line = f.readline()      
+    i += 1
+  
+  f.close()
+  
+  if not super_tag_found:
+    return -1
+  else:
+    return i
+
 def SearchForTag(tag, database_dir):
   lineIndexArray = []
   lineIndex = 0
@@ -326,9 +377,11 @@ def PrintResult(data):
   print(title[:len(title)-1] + "\n")
   print(result[:len(result)-1])
 
-def Answer(question, results_array, database_dir):
+def NormalAnswer(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
+    
+  '''OG search algorithm'''
   tag_lines_temp = []
   tag_lines = []
   
@@ -368,6 +421,79 @@ def Answer(question, results_array, database_dir):
   print("\n")
   print("Database best answer: " + str(best_result))
 
+def SearchForSubject(question, results_array, database_dir):
+  question = RemovePunctuation(question)
+  question_tags = question.split()
+  
+  try:
+    super_tag_index = SearchForSuperTag(question_tags, database_dir, len(results_array))
+  except:
+    super_tag_index = -1
+  
+  if super_tag_index != -1:
+    f = open(database_dir + "supertags.txt", "r", encoding = "utf-8")
+    f.seek(0)
+    line = f.readline()
+    
+    i = 0
+    while i <= super_tag_index:
+      line = line.strip()
+      if i == super_tag_index:
+        break
+      line = f.readline()
+      i += 1
+    f.close()
+
+    super_tag_array = line.split()
+    
+    '''
+    Search if there are other relevants tags in the question
+    '''
+    other_tags_found = False
+    i = 0
+    while i < len(question_tags):
+      if len(SearchForTag(question_tags[i].lower(), database_dir)) > 0:
+        other_tags_found = True
+        j = 0
+        while j < len(super_tag_array):
+          if CompareStrings(question_tags[i].lower(), super_tag_array[j]):
+            other_tags_found = False
+          j += 1
+
+        if other_tags_found:
+          break
+      i += 1
+    
+    if other_tags_found:
+      NormalAnswer(question, results_array, database_dir)
+    else:
+      print("Super tag found at line: " + str(super_tag_index) + "\n\n\n")
+      f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+      f.seek(0)
+      line = f.readline()
+      
+      i = 0
+      while i < len(results_array):
+        line = line.strip()
+        if i == super_tag_index:
+          PrintResult(line)
+          break
+        else:
+          i += 1
+          line = f.readline()
+      
+      print("\n\n\n\n")
+      print("Your question produced this tags:")
+      print(question_tags)
+      print("\n")
+      print("Database lines: ")
+      print(super_tag_array)
+      print("\n")
+      print("Database best answer: " + str(super_tag_index))
+      
+  else:
+    NormalAnswer(question, results_array, database_dir)
+
 def ShowHelpCommands():
   print("This are the developer commands that allows you to fully interact with me!")
   print("For example you can access my whole database or you can allows me to learn new things\n")
@@ -399,7 +525,7 @@ def main():
     elif question == "learn tags":
       TrainTags(database_dir)
     else: # The user asked a question to Sophia...
-      Answer(question, results_array, database_dir)
+      SearchForSubject(question, results_array, database_dir)
       input()
 
 main()
