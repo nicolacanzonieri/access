@@ -7,6 +7,7 @@
     - [X] Add answer function to Sophia
     - [X] Create folder only for database
     - [X] Create Super Tags!
+    - [ ] Add the function to fill the Super Tags database
     - [ ] Create Common Tags!
     - [ ] Add the possibility to show all the answers
     - [ ] Add search for synonyms function to Sophia
