@@ -168,6 +168,18 @@ def BuildTags(tag_array):
   tags = tags[:len(tags)-1]
   return tags
 
+def WriteSuperTagAtTheEnd(s, database_dir):
+  f = open(database_dir + "supertags.txt", "r+", encoding = "utf-8")
+  f.seek(0)
+  line = f.readline()
+  while line:
+    line = line.strip()
+    if not line:
+      break
+    line = f.readline()
+  f.write(s + "\n")
+  f.close()
+
 def WriteStopWordsAtTheEnd(s, database_dir):
   f = open(database_dir + "stop_words.txt", "r+", encoding = "utf-8")
   f.seek(0)
@@ -234,6 +246,7 @@ def Train(database_dir):
   
   newData = tags + "_" + data_array[0] + "_" + data_array[1] + "_"
   WriteAtTheEnd(newData, database_dir)
+  WriteSuperTagAtTheEnd(data_array[0].lower(), database_dir)
   print("Data saved on database!")
   input()
 
