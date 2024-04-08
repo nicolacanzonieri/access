@@ -20,4 +20,8 @@ Than run ACCESS and insert the command `learn`.
 Now you can ask ACCESS about that data and it will show the **Title** and the **Body** of your data
 
 ### How to train ACCESS tags identifier algorithm
-ACCESS use a complex algorithm to understeand the tags of a specific data, for this reason is important to update the **stop words database**.
+ACCESS use a complex algorithm to understeand the tags of a specific data, for this reason is important to update the **stop words database** regularly. You can do this by downloading the `stop_words_en.txt` everytime once in a while and placing it inside your `database` folder inside ACCESS, or you can train ACCESS with a **personal stop_words database**. To do this fill the `source.txt` file with the following pattern: use the first row of the file to place the **Title** of your data and than use the rows belows to add the **Body** of your data. 
+
+Now run ACCESS and insert the `train tags` command and follow the instructions on screen.
+
+Do this every time you want to update the stop words database!
