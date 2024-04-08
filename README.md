@@ -11,7 +11,7 @@ This project started as a personal hobby and is not yet intended for widespread 
 The idea behind ACCESS is really simple: you provide a piece of data and it will automatically catalog this resource in a database. Whenever you ask ACCESS something, it will try to understand and give you the best answer.
 
 ### How can I use ACCESS?
-*At the moment ACCESS use the italian version of the tag identifer algorithm, if you want to use ACCESS in another language you can go to the section "How to train ACCESS tags identifier algorithm"*
+*At the moment ACCESS tags identifier algorithm need to be "trained", for this reason read "How to train ACCESS tags identifier algorithm" before reading this chapter*
 
 Fill the `source.txt` file with a **Title** in the first row of the file and use the other rows to add the **Body** of your data.
 
