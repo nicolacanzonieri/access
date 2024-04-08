@@ -599,7 +599,6 @@ def SearchForSubject(question, results_array, database_dir):
 
 def ShowHelpCommands():
   print("This are the developer commands that allows you to fully interact with me!")
-  print("For example you can access my whole database or you can allows me to learn new things\n")
   print("Remember to use this functions only when you know what are you doing!\n\n\n")
   print("help:       Show developer commands")
   print("learn:      Add data to ACCESS database'")
