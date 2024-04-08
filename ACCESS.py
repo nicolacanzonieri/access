@@ -603,7 +603,7 @@ def ShowHelpCommands():
   print("Remember to use this functions only when you know what are you doing!\n\n\n")
   print("help:       Show developer commands")
   print("learn:      Add data to ACCESS database'")
-  print("learn tags: Train ACCESS tags identification")
+  print("train tags: Train ACCESS tags identification")
 
   input()
 
@@ -626,7 +626,7 @@ def main():
       ShowHelpCommands()
     elif question == "learn":
       Train(database_dir)
-    elif question == "learn tags":
+    elif question == "train tags":
       TrainTags(database_dir)
     elif question == "debug":
       InitializeDirectory(database_dir)
