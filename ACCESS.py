@@ -612,7 +612,7 @@ def main():
   database_dir = current_dir + "\database\\"
   
   results_array = []
-  #initialization_result = InitializeDirectory(database_dir)
+  initialization_result = InitializeDirectory(database_dir)
   
   while True:
     NewWindow()
