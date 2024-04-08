@@ -2,7 +2,7 @@
 A.C.C.E.S.S.
 Automated Cataloging and Classification Engine for Storage and Search
 ~
-Created by Nicola Canzonieri
+Created by Nicola Canzonieri ~ Halo
 '''
 
 import console
