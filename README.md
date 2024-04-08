@@ -1,3 +1,3 @@
-# S.O.P.H.I.A.
+# A.C.C.E.S.S.
 
-## Software for Organizing Personalized History with Intelligent Advice
+## Automated Cataloging and Classification Engine for Storage and Search
