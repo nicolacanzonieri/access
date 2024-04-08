@@ -13,7 +13,7 @@ import re
 
 isDesktop = True
 spaceWindowAmount = 20
-stop_wordsFileName = "stop_words_it.txt"
+stop_wordsFileName = "stop_words_en.txt"
 
 # Clear the user terminal window
 def NewWindow():
