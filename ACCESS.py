@@ -1,6 +1,6 @@
 '''
-S.O.P.H.I.A.
-Software for Organizing Personalized History with Intelligent Advice
+A.C.C.E.S.S.
+Automated Cataloging and Classification Engine for Storage and Search
 ~
 Created by Nicola Canzonieri
 '''
@@ -13,17 +13,87 @@ import re
 
 isDesktop = True
 spaceWindowAmount = 20
+stop_wordsFileName = "stop_words_it.txt"
 
+# Clear the user terminal window
 def NewWindow():
   if isDesktop == False:
     console.clear()
   else:
     os.system('cls' if os.name == 'nt' else 'clear')
+
+# Search file in specified directory
+def SearchElementInDir(database_dir, fileName):
+  found = False
+  elements = os.listdir()
+  for element in elements:
+    if element == fileName:
+      print("Found!")
+      found = True
+      return found
+
+# Create ACCESS files
+def InitializeDirectory(database_dir) -> bool:
+  if not os.path.exists(os.getcwd() + "\source.txt"):
+    print("Initializing source")
+    f = open("source.txt","x")
+    f.close();
+
+  if not os.path.exists(os.getcwd() + "\database"):
+    print("Initializing directory")
+    os.mkdir("database")
+    time.sleep(3)
+    f = open("database\data.txt","x")
+    f.close();
+    f = open("database\\" + stop_wordsFileName,"x")
+    f.close();
+    f = open("database\supertags.txt","x")
+    f.close();
+    return True
+  else :
+    if not os.path.exists(os.getcwd() + "\database\data.txt"):
+      print("Initializing database")
+      f = open("database\data.txt","x")
+      f.close();
+
+    if not os.path.exists(os.getcwd() + "\database\supertags.txt"):
+      print("Initializing supertags database")
+      f = open("database\supertags.txt","x")
+      f.close();
     
-def InitializeSophiaSearchArray(database_dir):
+    if not os.path.exists(os.getcwd() + "\database\\" + stop_wordsFileName):
+      while True:
+        NewWindow()
+        print("ERROR: stop_words database not found!\n\n\n")
+        print("We recommend downloading the proper stop words database from ACCESS's GitHub page\n")
+        print("Do you want to initialize a new empty stop words database? [1: Yes / 2: No]")
+        user_input = str(input())
+
+        if user_input == "1":
+          print("Initializing stop words database")
+          f = open("database\\" + stop_wordsFileName,"x")
+          f.close();
+          return True
+        elif user_input == "2":
+          return False
+        else:
+          NewWindow()
+          print("Unknown code!")
+          time.sleep(3)
+
+    return True
+          
+
+# Create a new file in specified directory
+def CreateFile(database_dir, fileName):
+  f = open(database_dir + fileName, 'w')
+  f.close()
+
+# 
+def InitializeAccessSearchArray(database_dir):
   results_array = []
   
-  f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+  f = open(database_dir + "data.txt", "r", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   number_of_lines = 0
@@ -44,15 +114,17 @@ def InitializeSophiaSearchArray(database_dir):
     i += 1
     
   return results_array
-    
+
+# Read source file (found in specified directory) and substitute accented chars with the relative non-accented char with an apostrophe
 def ReadAndNormalize(database_dir):
-  accented_chars = {'è': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
+  accented_chars = {'è': 'e\'', 'é': 'e\'', 'ò': 'o\'', 'à': 'a\'', 'ù': 'u\'', 'ì': 'i\''}
   with open("source.txt", 'r', encoding='utf-8') as f:
     text = f.read()
     for char in accented_chars:
       text = text.replace(char, accented_chars[char])
   return text
 
+# Find title and data about the argument discussed in the source file
 def FindTitleAndData(text):
   title = ""
   i = 0
@@ -67,6 +139,7 @@ def FindTitleAndData(text):
   data_array = [title, data]
   return data_array
 
+# Remove line feed from a string
 def RemoveLineFeed(data):
   i = 0
   while i < len(data):
@@ -78,30 +151,32 @@ def RemoveLineFeed(data):
 
   return data
 
+# Remove punctuation from a string
 def RemovePunctuation(str):
   i = 0
   
   while i < len(str):
     if ord(str[i:i+1]) >= 33 and ord(str[i:i+1]) <= 47:
-      str = str.replace(str[i:i+1], '', 1)
+      str = str.replace(str[i:i+1], ' ', 1)
       i -= 1
     elif ord(str[i:i+1]) >= 58 and ord(str[i:i+1]) <= 63:
-      str = str.replace(str[i:i+1], '', 1)
+      str = str.replace(str[i:i+1], ' ', 1)
       i -= 1
     elif ord(str[i:i+1]) >= 91 and ord(str[i:i+1]) <= 96:
-      str = str.replace(str[i:i+1], '', 1)
+      str = str.replace(str[i:i+1], ' ', 1)
       i -= 1
     elif ord(str[i:i+1]) >= 123 and ord(str[i:i+1]) <= 126:
-      str = str.replace(str[i:i+1], '', 1)
+      str = str.replace(str[i:i+1], ' ', 1)
       i -= 1
       
     i += 1
   
   return str
 
+# Given an string array, delete the element of this array that are stop words
 def OptimizeTags(str_array, database_dir):
   i = 0
-  f = open(database_dir + "stop_words.txt", "r+", encoding = "utf-8")
+  f = open(database_dir + stop_wordsFileName, "r+", encoding = "utf-8")
   
   while i < len(str_array):
     f.seek(0)
@@ -128,14 +203,13 @@ def OptimizeTags(str_array, database_dir):
     i += 1
   
   return str_array
-  
+
+# Remove duplicate tags in tags_array
 def RemoveDuplicateTags(tags_array):
-  #print(tags_array)
   i = 0
   while i < (len(tags_array) - 2):
     j  = i + 1
     while j < len(tags_array):
-      #print(str(i) + " - " + str(j) + " - " + str(len(tags_array))) #33 - 32 dove spunta l'errore
       try:
         if tags_array[i] == tags_array[j]:
           tags_array.pop(j)
@@ -147,6 +221,7 @@ def RemoveDuplicateTags(tags_array):
     i += 1
   return tags_array
 
+# First tag detector
 def DetectTags(str, database_dir):
   words = str.split()
   regex = r"^[a-zA-Z0-9]+$"
@@ -157,6 +232,7 @@ def DetectTags(str, database_dir):
   words = RemoveDuplicateTags(words)
   return OptimizeTags(words, database_dir)
 
+# Build tags string
 def BuildTags(tag_array):
   tags = ""
   i = 0
@@ -168,7 +244,8 @@ def BuildTags(tag_array):
   tags = tags[:len(tags)-1]
   return tags
 
-def WriteSuperTagAtTheEnd(s, database_dir):
+# Save new supertag in supertag database
+def SaveSuperTag(s, database_dir):
   f = open(database_dir + "supertags.txt", "r+", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
@@ -180,8 +257,9 @@ def WriteSuperTagAtTheEnd(s, database_dir):
   f.write(s + "\n")
   f.close()
 
-def WriteStopWordsAtTheEnd(s, database_dir):
-  f = open(database_dir + "stop_words.txt", "r+", encoding = "utf-8")
+# Save new stop words in stop words database
+def SaveStopWords(s, database_dir):
+  f = open(database_dir + stop_wordsFileName, "r+", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   while line:
@@ -192,8 +270,9 @@ def WriteStopWordsAtTheEnd(s, database_dir):
   f.write(s + "\n")
   f.close()
 
-def WriteAtTheEnd(s, database_dir):
-  f = open(database_dir + "sophiaDatabase.txt", "r+", encoding = "utf-8")
+# Save new data in ACCESS database
+def SaveData(s, database_dir):
+  f = open(database_dir + "data.txt", "r+", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   while line:
@@ -204,11 +283,12 @@ def WriteAtTheEnd(s, database_dir):
   f.write(s + "\n")
   f.close()
 
+# 
 def LearnTags(tag, tag_array, database_dir):
   i = 0
   while i < len(tag_array):
     if CompareStrings(tag, tag_array[i]):
-      WriteStopWordsAtTheEnd(tag, database_dir)
+      SaveStopWords(tag, database_dir)
       tag_array.pop(i)
       i -= 1
       break
@@ -217,12 +297,13 @@ def LearnTags(tag, tag_array, database_dir):
   
   return tag_array
 
+# Train ACCESS tag finder by removing wrong tags
 def TrainTags(database_dir):
   text = ReadAndNormalize(database_dir)
   data_array = FindTitleAndData(text)
   data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
   data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
-  tag_array = DetectTags(RemovePunctuation(data_array[1]), database_dir)
+  tag_array = RemoveDuplicateTags(DetectTags(RemovePunctuation(data_array[1]), database_dir))
   while True:
     NewWindow()
     print("I have found this tags in the source file:\n")
@@ -242,11 +323,11 @@ def Train(database_dir):
   data_array = FindTitleAndData(text)
   data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
   data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
-  tags = BuildTags(DetectTags(RemovePunctuation(data_array[1]),database_dir))
+  tags = BuildTags(RemoveDuplicateTags(DetectTags(RemovePunctuation(data_array[1]),database_dir)))
   
-  newData = tags + "_" + data_array[0] + "_" + data_array[1] + "_"
-  WriteAtTheEnd(newData, database_dir)
-  WriteSuperTagAtTheEnd(data_array[0].lower(), database_dir)
+  newData = tags + chr(29) + data_array[0] + chr(29) + data_array[1] + chr(29)
+  SaveData(newData, database_dir)
+  SaveSuperTag(RemovePunctuation(data_array[0].lower()), database_dir)
   print("Data saved on database!")
   input()
 
@@ -262,8 +343,14 @@ def CompareStrings(s1, s2):
     return True
 
 def SearchForSuperTag(question_tags, database_dir, database_len):
+  '''
+  - question_tags = question tags
+  - database_dir  = directory of the database
+  - database_len  = length of the result array
+  '''
   super_tag_found = False
   
+  # Open supertags database and read the first line
   f = open(database_dir + "supertags.txt", "r", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
@@ -316,7 +403,7 @@ def SearchForTag(tag, database_dir):
   lineIndexArray = []
   lineIndex = 0
   
-  f = open(database_dir + "sophiaDatabase.txt", "r",  encoding = "utf-8")
+  f = open(database_dir + "data.txt", "r",  encoding = "utf-8")
   f.seek(0)
   line = f.readline()
 
@@ -373,15 +460,15 @@ def PrintResult(data):
     if get_data:
       result += data[i:i+1]
     
-    if data[i:i+1] == "_" and cont == 0:
+    if data[i:i+1] == chr(29) and cont == 0:
       cont = 1
       get_title = True
       get_data = False
-    elif data[i:i+1] == "_" and cont == 1:
+    elif data[i:i+1] == chr(29) and cont == 1:
       cont = 2
       get_title = False
       get_data = True
-    elif data[i:i+1] == "_" and cont == 2:
+    elif data[i:i+1] == chr(29) and cont == 2:
       cont = 0
       get_title = False
       get_data = False
@@ -408,7 +495,7 @@ def NormalAnswer(question, results_array, database_dir):
   
   best_result = FindBestResult(tag_lines, results_array)
   
-  f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+  f = open(database_dir + "data.txt", "r", encoding = "utf-8")
   f.seek(0)
   line = f.readline()
   
@@ -443,6 +530,7 @@ def SearchForSubject(question, results_array, database_dir):
   except:
     super_tag_index = -1
   
+  # if ACCESS found a supertag in the question...
   if super_tag_index != -1:
     f = open(database_dir + "supertags.txt", "r", encoding = "utf-8")
     f.seek(0)
@@ -481,7 +569,7 @@ def SearchForSubject(question, results_array, database_dir):
       NormalAnswer(question, results_array, database_dir)
     else:
       print("Super tag found at line: " + str(super_tag_index) + "\n\n\n")
-      f = open(database_dir + "sophiaDatabase.txt", "r", encoding = "utf-8")
+      f = open(database_dir + "data.txt", "r", encoding = "utf-8")
       f.seek(0)
       line = f.readline()
       
@@ -504,41 +592,49 @@ def SearchForSubject(question, results_array, database_dir):
       print("\n")
       print("Database best answer: " + str(super_tag_index))
       
-  else:
+  else: # if ACCESS didn't found a supertag...
     NormalAnswer(question, results_array, database_dir)
+
+  input()
 
 def ShowHelpCommands():
   print("This are the developer commands that allows you to fully interact with me!")
   print("For example you can access my whole database or you can allows me to learn new things\n")
   print("Remember to use this functions only when you know what are you doing!\n\n\n")
   print("help:       Show developer commands")
-  print("learn:      Train Sophia's database'")
-  print("learn tags: Train Sophia's tags identification")
+  print("learn:      Add data to ACCESS database'")
+  print("learn tags: Train ACCESS tags identification")
+
+  input()
 
 def main():
   current_dir = os.getcwd()
-  database_dir = current_dir + "/database/"
+  database_dir = current_dir + "\database\\"
   
   results_array = []
+  #initialization_result = InitializeDirectory(database_dir)
   
   while True:
-    results_array = InitializeSophiaSearchArray(database_dir)
     NewWindow()
-    print("Ciao, sono Sophia!")
-    print("In cosa posso aiutarti oggi?")
+    print("Hi, welcome in ACCESS!")
+    print("How can I help you today?")
     print("\n\n")
     question = input()
     NewWindow()
     
     if question == "help":
       ShowHelpCommands()
-      input()
     elif question == "learn":
       Train(database_dir)
     elif question == "learn tags":
       TrainTags(database_dir)
-    else: # The user asked a question to Sophia...
-      SearchForSubject(question, results_array, database_dir)
+    elif question == "debug":
+      InitializeDirectory(database_dir)
       input()
+    elif question == "!end!":
+      break
+    else: # The user asked a question to ACCESS...
+      results_array = InitializeAccessSearchArray(database_dir)
+      SearchForSubject(question, results_array, database_dir)
 
 main()
