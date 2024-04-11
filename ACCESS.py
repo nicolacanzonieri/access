@@ -5,7 +5,11 @@ Automated Cataloging and Classification Engine for Storage and Search
 Created by Nicola Canzonieri ~ Halo
 '''
 
-import console
+try:
+  import console
+except:
+  print("Couldn't resolve console importation")
+
 import time
 import os
 import shutil
