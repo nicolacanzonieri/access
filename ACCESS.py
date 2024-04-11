@@ -28,7 +28,6 @@ def SearchElementInDir(database_dir, fileName):
   elements = os.listdir()
   for element in elements:
     if element == fileName:
-      print("Found!")
       found = True
       return found
 
@@ -89,7 +88,7 @@ def CreateFile(database_dir, fileName):
   f = open(database_dir + fileName, 'w')
   f.close()
 
-# 
+# Initialize ACCESS results array
 def InitializeAccessSearchArray(database_dir):
   results_array = []
   
@@ -283,7 +282,7 @@ def SaveData(s, database_dir):
   f.write(s + "\n")
   f.close()
 
-# 
+# Given a tag, the tag array and the database directory, remove the tag from the tag array and save it in the stop words database
 def LearnTags(tag, tag_array, database_dir):
   i = 0
   while i < len(tag_array):
@@ -317,7 +316,8 @@ def TrainTags(database_dir):
       break
     else:
       tag_array = LearnTags(answer, tag_array, database_dir)
-  
+ 
+# Add data to ACCESS database
 def Train(database_dir):
   text = ReadAndNormalize(database_dir)
   data_array = FindTitleAndData(text)
@@ -331,6 +331,7 @@ def Train(database_dir):
   print("Data saved on database!")
   input()
 
+# Given two strings, it returns true if the two strings are equal, otherwise it returns false
 def CompareStrings(s1, s2):
   if len(s1) != len(s2):
     return False
@@ -342,6 +343,7 @@ def CompareStrings(s1, s2):
       i += 1
     return True
 
+# 
 def SearchForSuperTag(question_tags, database_dir, database_len):
   '''
   - question_tags = question tags
@@ -399,6 +401,7 @@ def SearchForSuperTag(question_tags, database_dir, database_len):
   else:
     return i
 
+# 
 def SearchForTag(tag, database_dir):
   lineIndexArray = []
   lineIndex = 0
@@ -430,7 +433,8 @@ def SearchForTag(tag, database_dir):
 
   f.close()
   return lineIndexArray
-  
+
+#
 def FindBestResult(tag_lines, results_array):
   i = 0
   while i < len(tag_lines):
@@ -446,6 +450,7 @@ def FindBestResult(tag_lines, results_array):
   
   return best_index
 
+#
 def PrintResult(data):
   i = 0
   cont = 0
@@ -477,6 +482,7 @@ def PrintResult(data):
   print(title[:len(title)-1] + "\n")
   print(result[:len(result)-1])
 
+#
 def NormalAnswer(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
@@ -521,6 +527,7 @@ def NormalAnswer(question, results_array, database_dir):
   print("\n")
   print("Database best answer: " + str(best_result))
 
+#
 def SearchForSubject(question, results_array, database_dir):
   question = RemovePunctuation(question)
   question_tags = question.split()
@@ -597,6 +604,7 @@ def SearchForSubject(question, results_array, database_dir):
 
   input()
 
+# Show ACCESS commands
 def ShowHelpCommands():
   print("This are the developer commands that allows you to fully interact with me!")
   print("Remember to use this functions only when you know what are you doing!\n\n\n")
@@ -628,6 +636,7 @@ def main():
     elif question == "train tags":
       TrainTags(database_dir)
     elif question == "debug":
+      # Used only for debug purpose
       InitializeDirectory(database_dir)
       input()
     elif question == "!end!":
