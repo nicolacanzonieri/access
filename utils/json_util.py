@@ -10,3 +10,4 @@ def json_to_vec(path_to_json):
                 new_data += str(char)
         json_vec.append(new_data)
     print(json_vec)
+    # TODO!
