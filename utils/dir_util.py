@@ -39,5 +39,4 @@ Return true if a certain file or directory exist in the given path
 @param "path" : a string containing the path to a directory or a file
 '''
 def check(path) -> bool:
-    print()
-    # TODO!
+    return os.path.exists(path)
