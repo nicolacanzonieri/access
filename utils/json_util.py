@@ -9,6 +9,8 @@ def json_to_vec(path_to_json):
         for char in line:
             if its_a_letter(char) or its_a_number(char):
                 new_data += str(char)
-        json_vec.append(new_data)
+            elif char == chr(10): # if char it's new line feed...
+                json_vec.append(new_data)
+                new_data = ""
     print_vec(json_vec)
     # TODO!
