@@ -1,10 +1,12 @@
 import os
 
+
 '''
 Get the path separator for the current OS
 '''
 def get_path_separator() -> str:
     return os.sep
+
 
 '''
 Return the os' accepted path (str) to a specified file with the correct path separator
