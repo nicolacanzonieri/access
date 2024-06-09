@@ -37,14 +37,19 @@ def get_path_to(path_to_file) -> str:
 Return a string containing the parent path for a given path
 @param "current_path" : the path where the parent folder will be extracted
 '''
-def get_prnt_folder(current_path) -> str:
+def get_prnt_folder(current_path, prnt_lvl) -> str:
     path_len = len(current_path)
+    prnt_lvl_indx = 1
     index = path_len
-    while index > 0:
+
+    while index > 0 and prnt_lvl_indx > 0:
         if current_path[index-1 : index] == get_path_separator():
-            return current_path[0 : index]
+            if prnt_lvl_indx == prnt_lvl:
+                return current_path[0 : index]
+            else:
+                prnt_lvl_indx += 1
         index -= 1
-    return ""
+    return current_path
 
 
 '''
