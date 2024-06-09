@@ -1,8 +1,18 @@
+'''
+DIR UTIL
+
+Index:
+- get_path_separator()
+- get_path_to()
+- check()
+'''
+
+
 import os
 
 
 '''
-Get the path separator for the current OS
+Return the path separator (str) for the current OS
 '''
 def get_path_separator() -> str:
     return os.sep
@@ -22,3 +32,12 @@ def get_path_to(path_to_file) -> str:
     full_path = "." + get_path_separator() + full_path
     
     return full_path
+
+
+'''
+Return true if a certain file or directory exist in the given path
+@param "path" : a string containing the path to a directory or a file
+'''
+def check(path) -> bool:
+    print()
+    # TODO!

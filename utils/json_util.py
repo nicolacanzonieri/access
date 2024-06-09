@@ -1,3 +1,12 @@
+'''
+JSON UTIL
+
+Index:
+- json_to_vec()
+- print_json_vec()
+'''
+
+
 from utils.char_util import its_a_letter, its_a_number
 from utils.vec_util import print_vec
 from utils.str_util import clean_str
@@ -5,7 +14,7 @@ from utils.str_util import clean_str
 
 '''
 Returns a vector with the elements of a JSON file.
-@param path_to_json: The path to a specific JSON file.
+@param path_to_json: the path to a specific JSON file.
 '''
 def json_to_vec(path_to_json) -> list:
     json_vec = []
@@ -40,6 +49,10 @@ def json_to_vec(path_to_json) -> list:
                         its_data = False
     return json_vec
 
+'''
+Print a json vector on terminal
+@param "path_to_json" : the path to a specific JSON file.
+'''
 def print_json_vec(path_to_json):
     json_vec = json_to_vec(path_to_json)
     print_vec(json_vec)

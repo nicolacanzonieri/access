@@ -1,8 +1,16 @@
 '''
-Clean a string from the following elements:
+STR UTIL
+
+Index:
+- clean_str()
+'''
+
+
+'''
+Return a string cleaned from the following "mistakes":
 - Spaces at the start of the string
 
-@param "string" : a string
+@param "string" : a string to clean
 '''
 def clean_str(string) -> str:
     better_str = ""

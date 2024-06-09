@@ -1,4 +1,14 @@
 '''
+CHAR UTIL
+
+Index:
+- its_a_letter()
+- its_a_number()
+- its_a_bracket()
+'''
+
+
+'''
 Return true if the given char is a letter
 '''
 def its_a_letter(char) -> bool:

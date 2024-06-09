@@ -1,4 +1,13 @@
 '''
+VEC UTIL
+
+Index:
+- print_vec()
+- print_matrix()
+'''
+
+
+'''
 Print a python list in terminal
 @param "vec" : a python list
 '''
