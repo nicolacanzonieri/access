@@ -7,7 +7,7 @@
 - [ ] Better answer print
 - [ ] Encrypted database
 - [ ] Source editor
-- [ ] Unix/PS detection
+- [X] Unix/PS detection
 - [ ] User can add custom tags to new data
 - [ ] Database orthographic check
 - [ ] Database symmetry check
