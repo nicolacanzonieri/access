@@ -6,19 +6,23 @@ Branch containing the newer and better version of ACCESS
 
 ### High Priority
 - [ ] Source editor
-- [ ] Better search and tags identification algorithm
+- [ ] TD-IDF implementation
+- [ ] Custom search and tags identification algorithm
 - [ ] Encrypted database
 
 ### Low Priority
 - [ ] Adjust dir_util specifications
 - [ ] Check all functions specifications
-- [ ] Directory manager
+
+### Waiting list
+- [ ] Directory manager (waiting for the database structure to be defined)
 
 ### Objectives
 - [X] Unix/PS detection
 - [ ] Encrypted database
 - [ ] Better answer print
-- [ ] Better search and tags identification algorithm
+- [ ] TD-IDF implementation
+- [ ] Custom search and tags identification algorithm
 - [ ] User can add custom tags to new data
 - [ ] Source editor
 - [ ] Database orthographic check
