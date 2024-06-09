@@ -1,16 +1,18 @@
 # ACCESS v2: develop
 
-Work in progress
+Branch containing the newer and better version of ACCESS
 
 ## To Do
 
 ### High Priority
-- [ ] Directory manager
 - [ ] Source editor
+- [ ] Better search and tags identification algorithm
+- [ ] Encrypted database
 
 ### Low Priority
 - [ ] Adjust dir_util specifications
 - [ ] Check all functions specifications
+- [ ] Directory manager
 
 ### Objectives
 - [X] Unix/PS detection
@@ -18,5 +20,6 @@ Work in progress
 - [ ] Better answer print
 - [ ] Better search and tags identification algorithm
 - [ ] User can add custom tags to new data
+- [ ] Source editor
 - [ ] Database orthographic check
 - [ ] Database symmetry check
