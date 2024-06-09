@@ -1,4 +1,5 @@
-from char_util import *
+from utils.char_util import its_a_letter, its_a_number
+from utils.vec_util import print_vec
 
 def json_to_vec(path_to_json):
     json_vec = []
@@ -9,5 +10,5 @@ def json_to_vec(path_to_json):
             if its_a_letter(char) or its_a_number(char):
                 new_data += str(char)
         json_vec.append(new_data)
-    print(json_vec)
+    print_vec(json_vec)
     # TODO!
