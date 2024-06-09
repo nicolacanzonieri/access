@@ -1,13 +1,15 @@
 # ACCESS: TO DO
  List of things to do to ACCESS v2
 
-# Priority
+## High Priority
 - [ ] Directory manager
 - [ ] Source editor
 
-# Other todos
-- [ ] Get some algorithms from ACCESS v1
-- [X] Implement check function in dir_util
+## Low Priority
+- [ ] Adjust dir_util specifications
+- [ ] Check all functions specifications
+
+## Objectives
 - [X] Unix/PS detection
 - [ ] Encrypted database
 - [ ] Better answer print
