@@ -11,17 +11,19 @@ Returns a vector with the elements of a JSON file.
 def json_to_vec(path_to_json, parameters):
     json_vec = []
     with open(path_to_json, "r") as json_file:
-        line = json_file.read()
-        new_data = ""
-        for char in line:
+        line = json_file.read() # line is a string that contains the whole json file
+        json_data = "" # Initialize json_data
+
+        for char in line: # Analyze each character of the json file
+            # If the char it's number/letter/'space'..
             if its_a_letter(char) or its_a_number(char) or char == ' ':
-                new_data += str(char)
-                for parameter in parameters.split(): # delete the parameter name
-                    if new_data == parameter:
-                        new_data = ""
+                json_data += str(char) # Add char to the data
+                for parameter in parameters.split(): # Delete the parameters name from the data
+                    if json_data == parameter:
+                        json_data = ""
             elif char == chr(10): # if char it's new line feed...
-                if clean_str(new_data) != "":
-                    json_vec.append(clean_str(new_data))
-                    new_data = ""
+                # If the data is not an empty string than it's a real data and can be added to the vec
+                if clean_str(json_data) != "":
+                    json_vec.append(clean_str(json_data))
+                    json_data = ""
     print_vec(json_vec)
-    # TODO!
