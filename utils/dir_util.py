@@ -4,7 +4,9 @@ DIR UTIL
 Index:
 - get_path_separator()
 - get_path_to()
+- get_prnt_folder()
 - check()
+- create_file()
 '''
 
 
