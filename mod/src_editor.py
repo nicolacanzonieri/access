@@ -13,6 +13,7 @@ from enum import Enum
 
 from utils.dir_util import get_path_to
 from utils.file_util import get_file
+from utils.vec_util import print_matrix
 
 
 class Mode(Enum):
@@ -33,10 +34,10 @@ if sys.platform == "win32":
             key = msvcrt.getch()
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "CTRL+M"
-            elif key == b"\x11":  # Ctrl+Q
-                return "CTRL+Q"
-            elif key == b"\x08":  # Backspace/Delete key
-                return "DELETE"
+            elif key == b'\x11':  # Ctrl+Q
+                return 'CTRL+Q'
+            elif key == b'\x08':  # Backspace/Delete key
+                return 'DELETE'
             return key.decode("utf-8")
 
 else:
@@ -52,9 +53,9 @@ else:
             if ord(key) == 13:  # Ctrl+M (Enter key)
                 return "CTRL+M"
             elif ord(key) == 17:  # Ctrl+Q
-                return "CTRL+Q"
+                return 'CTRL+Q'
             elif ord(key) == 127:  # Backspace/Delete key
-                return "DELETE"
+                return 'DELETE'
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
@@ -64,47 +65,54 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def print_editor(file_lines):
-    line_x_index = 0
-    line_y_index = 0
-    line_len = 0
+def file_to_vec(path_to_file) -> list:
+    file_line = get_file(path_to_file)
+    file_vec = []
+    sub_file_line = ""
     char_index = 0
 
-    while char_index <= len(file_lines):
-        if file_lines[char_index : char_index + 1] == "\n" or char_index == len(
-            file_lines
-        ):
-            print("")
-            blank_line_index = 0
-            while blank_line_index < line_len:
-                # If we are in the cursor position, draw it
-                if cursor_x == line_x_index and cursor_y == line_y_index:
-                    print("^", end="")
-                else:
-                    print(" ", end="")
-                line_x_index += 1
-                blank_line_index += 1
-            line_x_index = 0
-            line_y_index += 1
-            line_len = 0
-            print("")
+    if file_line[len(file_line) - 1 : len(file_line)] != "\n":
+        file_line += "\n"
+
+    while char_index < len(file_line):
+        if file_line[char_index : char_index + 1] != "\n":
+            sub_file_line += file_line[char_index : char_index + 1]
         else:
-            print(file_lines[char_index : char_index + 1], end="")
-            line_len += 1
+            file_vec.append(sub_file_line)
+            sub_file_line = ""
         char_index += 1
+    return file_vec
 
 
-def main_logic(path_to_file):
+def print_editor(file_vec, mode):
+    line_x_index = 0
+
+    print(mode.name, end="")
+    print("\n\n\n", end="")
+
+    for line_y_index, line in enumerate(file_vec):
+        print(line)
+        blank_line_index = 0
+        while blank_line_index < len(line):
+            # If we are in the cursor position, draw it
+            if cursor_x == line_x_index and cursor_y == line_y_index:
+                print("^", end="")
+            else:
+                print(" ", end="")
+            line_x_index += 1
+            blank_line_index += 1
+        line_x_index = 0
+        print()
+
+
+def main_logic(file_vec):
     global mode
     global cursor_x
     global cursor_y
-    file_lines = get_file(path_to_file)
 
     clear_terminal()
     while True:
-        print(mode.name, end="")
-        print("\n\n\n", end="")
-        print_editor(file_lines)
+        print_editor(file_vec, mode)
         try:
             user_input = get_key()
         except:
@@ -118,21 +126,25 @@ def main_logic(path_to_file):
                 mode = Mode.EDIT
             else:
                 mode = Mode.NAVIGATION
-        elif user_input.lower() == "w" and mode == Mode.NAVIGATION:
+        elif user_input == "w" and mode == Mode.NAVIGATION:
             cursor_y -= 1
-        elif user_input.lower() == "a" and mode == Mode.NAVIGATION:
+        elif user_input == "a" and mode == Mode.NAVIGATION:
             cursor_x -= 1
-        elif user_input.lower() == "s" and mode == Mode.NAVIGATION:
+        elif user_input == 'A' and mode == Mode.NAVIGATION:
+            cursor_x -= 5
+        elif user_input == "s" and mode == Mode.NAVIGATION:
             cursor_y += 1
-        elif user_input.lower() == "d" and mode == Mode.NAVIGATION:
+        elif user_input == "d" and mode == Mode.NAVIGATION:
             cursor_x += 1
+        elif user_input == 'D' and mode == Mode.NAVIGATION:
+            cursor_x += 5
         elif user_input == "DELETE" and mode == Mode.EDIT:
             print()
             # TODO: Add a way to modify the values of the file
 
 
-def start(path_to_file):
-    main_logic_thread = threading.Thread(main_logic(path_to_file))
+def start(file_vec):
+    main_logic_thread = threading.Thread(main_logic(file_vec))
 
     main_logic_thread.start()
 
@@ -141,4 +153,5 @@ def start(path_to_file):
 
 
 def test(path_to_file):
-    start(path_to_file)
+    file_vec = file_to_vec(path_to_file)
+    start(file_vec)
