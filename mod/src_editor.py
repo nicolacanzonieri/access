@@ -33,10 +33,10 @@ if sys.platform == "win32":
             key = msvcrt.getch()
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "CTRL+M"
-            elif key == b'\x11':  # Ctrl+Q
-                return 'CTRL+Q'
-            elif key == b'\x08':  # Backspace/Delete key
-                return 'DELETE'
+            elif key == b"\x11":  # Ctrl+Q
+                return "CTRL+Q"
+            elif key == b"\x08":  # Backspace/Delete key
+                return "DELETE"
             return key.decode("utf-8")
 
 else:
@@ -52,15 +52,16 @@ else:
             if ord(key) == 13:  # Ctrl+M (Enter key)
                 return "CTRL+M"
             elif ord(key) == 17:  # Ctrl+Q
-                return 'CTRL+Q'
+                return "CTRL+Q"
             elif ord(key) == 127:  # Backspace/Delete key
-                return 'DELETE'
+                return "DELETE"
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
 
+
 def clear_terminal():
-  os.system('cls' if os.name == 'nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def print_editor(file_lines):
@@ -69,34 +70,28 @@ def print_editor(file_lines):
     line_len = 0
     char_index = 0
 
-    while char_index < len(file_lines):
-        if file_lines[char_index : char_index + 1] != "\n":
-            print(file_lines[char_index : char_index + 1], end="")
-            line_len += 1
-        else:
-            # Print black line for cursor
-
-            print("\n", end="")  # New line
-            blank_line_index = 0  # Initialization of blank_line_index (equals to length of the text line just written)
-
-            while blank_line_index <= line_len:
-                # Write the blank line
-
+    while char_index <= len(file_lines):
+        if file_lines[char_index : char_index + 1] == "\n" or char_index == len(
+            file_lines
+        ):
+            print("")
+            blank_line_index = 0
+            while blank_line_index < line_len:
                 # If we are in the cursor position, draw it
                 if cursor_x == line_x_index and cursor_y == line_y_index:
                     print("^", end="")
                 else:
                     print(" ", end="")
-                blank_line_index += 1
                 line_x_index += 1
-
-            # Re-initialization of parameters
-            line_len = 0
+                blank_line_index += 1
             line_x_index = 0
             line_y_index += 1
-            print("\n", end="")  # New line
+            line_len = 0
+            print("")
+        else:
+            print(file_lines[char_index : char_index + 1], end="")
+            line_len += 1
         char_index += 1
-    print("\n", end="")
 
 
 def main_logic(path_to_file):
@@ -104,13 +99,16 @@ def main_logic(path_to_file):
     global cursor_x
     global cursor_y
     file_lines = get_file(path_to_file)
-    
+
     clear_terminal()
     while True:
         print(mode.name, end="")
-        print("\n\n", end="")
+        print("\n\n\n", end="")
         print_editor(file_lines)
-        user_input = get_key()
+        try:
+            user_input = get_key()
+        except:
+            user_input = ""
         clear_terminal()
 
         if user_input == "CTRL+Q":
