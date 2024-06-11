@@ -35,6 +35,8 @@ if sys.platform == "win32":
                 return "CTRL+M"
             elif key == b'\x11':  # Ctrl+Q
                 return 'CTRL+Q'
+            elif key == b'\x08':  # Backspace/Delete key
+                return 'DELETE'
             return key.decode("utf-8")
 
 else:
@@ -51,10 +53,11 @@ else:
                 return "CTRL+M"
             elif ord(key) == 17:  # Ctrl+Q
                 return 'CTRL+Q'
+            elif ord(key) == 127:  # Backspace/Delete key
+                return 'DELETE'
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
-
 
 def clear_terminal():
   os.system('cls' if os.name == 'nt' else 'clear')
@@ -117,14 +120,17 @@ def main_logic(path_to_file):
                 mode = Mode.EDIT
             else:
                 mode = Mode.NAVIGATION
-        elif user_input.lower() == "w":
+        elif user_input.lower() == "w" and mode == Mode.NAVIGATION:
             cursor_y -= 1
-        elif user_input.lower() == "a":
+        elif user_input.lower() == "a" and mode == Mode.NAVIGATION:
             cursor_x -= 1
-        elif user_input.lower() == "s":
+        elif user_input.lower() == "s" and mode == Mode.NAVIGATION:
             cursor_y += 1
-        elif user_input.lower() == "d":
+        elif user_input.lower() == "d" and mode == Mode.NAVIGATION:
             cursor_x += 1
+        elif user_input == "DELETE" and mode == Mode.EDIT:
+            print()
+            # TODO: Add a way to modify the values of the file
 
 
 def start(path_to_file):
