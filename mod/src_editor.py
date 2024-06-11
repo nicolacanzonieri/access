@@ -87,7 +87,8 @@ def file_to_vec(path_to_file) -> list:
 def print_editor(file_vec, mode):
     line_x_index = 0
 
-    print(mode.name, end="")
+    print("[ CTRL-M : Change mode ] [ CTRL-Q : Close Editor ] [ SHIFT-A/SHIFT-D: Move faster ]\n")
+    print("MODE: " + mode.name) 
     print("\n\n\n", end="")
 
     for line_y_index, line in enumerate(file_vec):
