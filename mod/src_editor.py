@@ -65,25 +65,6 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def file_to_vec(path_to_file) -> list:
-    file_line = get_file(path_to_file)
-    file_vec = []
-    sub_file_line = ""
-    char_index = 0
-
-    if file_line[len(file_line) - 1 : len(file_line)] != "\n":
-        file_line += "\n"
-
-    while char_index < len(file_line):
-        if file_line[char_index : char_index + 1] != "\n":
-            sub_file_line += file_line[char_index : char_index + 1]
-        else:
-            file_vec.append(sub_file_line)
-            sub_file_line = ""
-        char_index += 1
-    return file_vec
-
-
 def print_editor(file_vec, mode):
     line_x_index = 0
 
