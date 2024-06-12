@@ -12,7 +12,7 @@ import os
 from enum import Enum
 
 from utils.dir_util import get_path_to
-from utils.file_util import get_file
+from utils.file_util import get_file, file_to_vec
 from utils.vec_util import print_matrix
 
 
