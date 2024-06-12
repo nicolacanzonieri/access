@@ -129,10 +129,16 @@ def main_logic(file_vec):
                 mode = Mode.NAVIGATION
         elif user_input == "w" and mode == Mode.NAVIGATION:
             cursor_y -= 1
+            if cursor_y < 0:
+                cursor_y = 0
         elif user_input == "a" and mode == Mode.NAVIGATION:
             cursor_x -= 1
+            if cursor_x < 0:
+                cursor_x = 0
         elif user_input == 'A' and mode == Mode.NAVIGATION:
             cursor_x -= 5
+            if cursor_x < 0:
+                cursor_x = 0
         elif user_input == "s" and mode == Mode.NAVIGATION:
             cursor_y += 1
         elif user_input == "d" and mode == Mode.NAVIGATION:
