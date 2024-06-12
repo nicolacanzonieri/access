@@ -3,6 +3,8 @@ FILE UTIL
 
 Index:
 - print_file()
+- get_file()
+- file_to_vec()
 '''
 
 
