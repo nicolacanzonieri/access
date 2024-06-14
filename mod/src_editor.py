@@ -61,8 +61,48 @@ else:
         return key
 
 
+def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
+    if user_input != "DELETE":
+        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + user_input + file_vec[cursor_y][cursor_x : ]
+        return [file_vec, cursor_x + 1]
+    else:
+        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
+        return [file_vec, cursor_x - 1]
+
+
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
+    if user_input == "CTRL+M":
+        if mode == Mode.NAVIGATION:
+            mode = Mode.EDIT
+        else:
+            mode = Mode.NAVIGATION
+    elif user_input == "w" and mode == Mode.NAVIGATION:
+        cursor_y -= 1
+        if cursor_y < 0:
+            cursor_y = 0
+    elif user_input == "a" and mode == Mode.NAVIGATION:
+        cursor_x -= 1
+        if cursor_x < 0:
+            cursor_x = 0
+    elif user_input == 'A' and mode == Mode.NAVIGATION:
+        cursor_x -= 5
+        if cursor_x < 0:
+            cursor_x = 0
+    elif user_input == "s" and mode == Mode.NAVIGATION:
+        cursor_y += 1
+    elif user_input == "d" and mode == Mode.NAVIGATION:
+        cursor_x += 1
+    elif user_input == 'D' and mode == Mode.NAVIGATION:
+        cursor_x += 5
+    elif mode == Mode.EDIT:
+        handler = edit_file(file_vec, user_input, cursor_x, cursor_y)
+        file_vec = handler[0]
+        cursor_x = handler[1]
+    return [file_vec, user_input, mode, cursor_x, cursor_y]
 
 
 def print_editor(file_vec, mode):
@@ -103,32 +143,13 @@ def main_logic(file_vec):
 
         if user_input == "CTRL+Q":
             break
-        elif user_input == "CTRL+M":
-            if mode == Mode.NAVIGATION:
-                mode = Mode.EDIT
-            else:
-                mode = Mode.NAVIGATION
-        elif user_input == "w" and mode == Mode.NAVIGATION:
-            cursor_y -= 1
-            if cursor_y < 0:
-                cursor_y = 0
-        elif user_input == "a" and mode == Mode.NAVIGATION:
-            cursor_x -= 1
-            if cursor_x < 0:
-                cursor_x = 0
-        elif user_input == 'A' and mode == Mode.NAVIGATION:
-            cursor_x -= 5
-            if cursor_x < 0:
-                cursor_x = 0
-        elif user_input == "s" and mode == Mode.NAVIGATION:
-            cursor_y += 1
-        elif user_input == "d" and mode == Mode.NAVIGATION:
-            cursor_x += 1
-        elif user_input == 'D' and mode == Mode.NAVIGATION:
-            cursor_x += 5
-        elif user_input == "DELETE" and mode == Mode.EDIT:
-            print()
-            # TODO: Add a way to modify the values of the file
+        else:
+            handler = mng_input(file_vec, user_input, mode, cursor_x, cursor_y)
+            file_vec = handler[0]
+            user_input = handler[1]
+            mode = handler[2]
+            cursor_x = handler[3]
+            cursor_y = handler[4]
 
 
 def start(file_vec):
