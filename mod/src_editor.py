@@ -63,7 +63,7 @@ else:
 
 def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
     if user_input != "DELETE":
-        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + user_input + file_vec[cursor_y][cursor_x : ]
+        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x + 1] + user_input + file_vec[cursor_y][cursor_x + 1 : ]
         return [file_vec, cursor_x + 1]
     else:
         file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
