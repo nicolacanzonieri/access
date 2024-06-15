@@ -24,6 +24,7 @@ class Mode(Enum):
 mode = Mode.NAVIGATION
 cursor_x = 0
 cursor_y = 0
+last_key = ""
 
 
 if sys.platform == "win32":
@@ -38,6 +39,8 @@ if sys.platform == "win32":
                 return 'CTRL+Q'
             elif key == b'\x08':  # Backspace/Delete key
                 return 'DELETE'
+            elif key == b'\xe0':
+                return 'CANCEL'
             return key.decode("utf-8")
 
 else:
@@ -50,24 +53,37 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
-            if ord(key) == 13:  # Ctrl+M (Enter key)
+            if ord(key) == 13:
                 return "CTRL+M"
-            elif ord(key) == 17:  # Ctrl+Q
+            elif ord(key) == 17:
                 return 'CTRL+Q'
-            elif ord(key) == 127:  # Backspace/Delete key
+            elif ord(key) == 127:
                 return 'DELETE'
+            elif ord(key) == 3:
+                return 'CANCEL'
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
 
 
 def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
-    if user_input != "DELETE":
-        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x + 1] + user_input + file_vec[cursor_y][cursor_x + 1 : ]
-        return [file_vec, cursor_x + 1]
-    else:
+    global last_key
+
+    if user_input == "DELETE":
         file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
+        last_key = user_input
         return [file_vec, cursor_x - 1]
+    elif user_input == "CANCEL":
+        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
+        last_key = user_input
+        return [file_vec, cursor_x - 1]
+    else:
+        if last_key != "CANCEL":
+            file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x + 1] + user_input + file_vec[cursor_y][cursor_x + 1 : ]
+            last_key = user_input
+            return [file_vec, cursor_x + 1]
+        else:
+            return [file_vec, cursor_x + 1]
 
 
 def clear_terminal():
