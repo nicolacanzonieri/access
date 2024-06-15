@@ -53,13 +53,14 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
+            print(str(ord(key)))
             if ord(key) == 13:
                 return "CTRL+M"
             elif ord(key) == 17:
                 return 'CTRL+Q'
             elif ord(key) == 127:
                 return 'DELETE'
-            elif ord(key) == 3:
+            elif ord(key) == 126:
                 return 'CANCEL'
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
