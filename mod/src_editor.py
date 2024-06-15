@@ -71,9 +71,12 @@ def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
     global last_key
 
     if user_input == "DELETE":
-        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
-        last_key = user_input
-        return [file_vec, cursor_x - 1]
+        if cursor_x > 0:
+            file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x - 1] + file_vec[cursor_y][cursor_x : ]
+            last_key = user_input
+            return [file_vec, cursor_x - 1]
+        else:
+            return [file_vec, cursor_x]
     elif user_input == "CANCEL":
         file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
         last_key = user_input
