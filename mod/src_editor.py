@@ -32,7 +32,7 @@ mode = Mode.NAVIGATION
 cursor_x = 0
 cursor_y = 0
 last_key = ""
-max_string_lenght = json_to_vec(get_path_to("json sys_var.json"))
+max_string_length = json_to_vec(get_path_to("json sys_var.json"))
 
 
 '''
