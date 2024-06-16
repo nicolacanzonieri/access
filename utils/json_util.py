@@ -56,7 +56,7 @@ def json_to_vec(path_to_json) -> list:
 Edit a json file with a different value in a specified row
 @param "path_to_json" : a string containing the path to a .json file
 @param "row" : the row where to insert the new value. Remember that rows start from 0!
-@param "new_value" : the new value to insert. This parameter must have the following syntax: 'value' (eg: '"Example"')
+@param "new_value" : the new value to insert. This parameter must have the following syntax: '"Example"'
 '''
 def edit_json(path_to_json, row, new_value):
     file_vec = file_to_vec(path_to_json)

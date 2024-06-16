@@ -10,6 +10,9 @@ import sys
 import os
 
 
+from utils.json_util import edit_json
+
+
 '''
 Value of the max string length choosed by the user
 '''
@@ -25,7 +28,6 @@ if sys.platform == "win32":
     def get_key():
         while True:
             key = msvcrt.getch()
-            print(key)
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "ENTER"
             if key == b'\x1b':
@@ -42,9 +44,10 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
-            print(ord(key))
             if ord(key) == 13:
                 return "ENTER"
+            if ord(key) == 27:
+                return "ESCAPE"
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
@@ -78,10 +81,12 @@ def get_max_string_length_thread():
             user_input = get_key()
         except:
             user_input = ""
-        #clear_terminal()
+        clear_terminal()
 
         if user_input == "ENTER":
             max_string_length = len(length_vis)
+            break
+        elif user_input == "ESCAPE":
             break
         elif user_input == "a":
             length_vis = length_vis[: len(length_vis) - 1]
@@ -99,7 +104,7 @@ def get_max_string_length_thread():
 '''
 Return the preferred max string length choosed by the user 
 '''
-def get_max_string_length() -> int:
+def init_max_string_length(path_to_json):
     get_max_string_length = threading.Thread(get_max_string_length_thread())
 
     get_max_string_length.start()
@@ -107,4 +112,5 @@ def get_max_string_length() -> int:
     # Wait for both threads to finish before exiting
     get_max_string_length.join()
 
-    return max_string_length
+    if max_string_length != 0:
+        edit_json(path_to_json, 1, '"' + str(max_string_length) + '"')
