@@ -72,6 +72,16 @@ def edit_json(path_to_json, row, new_value):
 
 
 '''
+Return a string containing the value of a json value in a given row:
+@param "path_to_json" : a string containing the path to a .json file
+@param "value_id" : the number of the data (eg. the first value have id = 0, the second one have id = 1, ect...)
+'''
+def get_json_value(path_to_json, value_id) -> str:
+    json_vec = json_to_vec(path_to_json)
+    return json_vec[value_id]
+            
+
+'''
 Print a json vector on terminal
 @param "path_to_json" : the path to a specific JSON file.
 '''
