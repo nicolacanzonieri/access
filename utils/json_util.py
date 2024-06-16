@@ -3,6 +3,7 @@ JSON UTIL
 
 Index:
 - json_to_vec()
+- edit_json()
 - print_json_vec()
 '''
 
@@ -10,6 +11,7 @@ Index:
 from utils.char_util import its_a_letter, its_a_number
 from utils.vec_util import print_vec
 from utils.str_util import clean_str
+from utils.file_util import file_to_vec, vec_to_file
 
 
 '''
@@ -48,6 +50,26 @@ def json_to_vec(path_to_json) -> list:
                         json_data = ""
                         its_data = False
     return json_vec
+
+
+'''
+Edit a json file with a different value in a specified row
+@param "path_to_json" : a string containing the path to a .json file
+@param "row" : the row where to insert the new value. Remember that rows start from 0!
+@param "new_value" : the new value to insert. This parameter must have the following syntax: 'value' (eg: '"Example"')
+'''
+def edit_json(path_to_json, row, new_value):
+    file_vec = file_to_vec(path_to_json)
+    for char_index, char in enumerate(file_vec[row]):
+        if file_vec[row][char_index] == ':':
+            file_vec[row] = file_vec[row][: char_index + 1] + " " + new_value
+            # If the json contains multiple values and the modified row is not the last one (containing data)
+            # than we have to add the ',' character at the end of the data
+            if len(file_vec) > 3 and row < len(file_vec) - 2:
+                file_vec[row] += ","
+            break
+    vec_to_file(path_to_json, file_vec)
+
 
 '''
 Print a json vector on terminal
