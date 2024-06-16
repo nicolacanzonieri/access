@@ -5,7 +5,11 @@ Index:
 - print_file()
 - get_file()
 - file_to_vec()
+- vec_to_file()
 '''
+
+
+from utils.dir_util import create_file
 
 
 '''
@@ -49,3 +53,15 @@ def file_to_vec(path_to_file) -> list:
             sub_file_line = ""
         char_index += 1
     return file_vec
+
+
+'''
+Create or overwrite a current file by rebuilding it from a file_vec
+@param "path_to_file" : a string containing the path to a file
+@param "file_vec" : a list containing the file' lines
+'''
+def vec_to_file(path_to_file, file_vec):
+    new_file_text = ""
+    for line in file_vec:
+        new_file_text += line + "\n"
+    create_file(path_to_file, new_file_text)
