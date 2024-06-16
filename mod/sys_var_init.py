@@ -25,8 +25,11 @@ if sys.platform == "win32":
     def get_key():
         while True:
             key = msvcrt.getch()
+            print(key)
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "ENTER"
+            if key == b'\x1b':
+                return "ESCAPE"
             return key.decode("utf-8")
 
 else:
@@ -39,6 +42,7 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
+            print(ord(key))
             if ord(key) == 13:
                 return "ENTER"
         finally:
@@ -69,12 +73,12 @@ def get_max_string_length_thread():
         print("")
         print(length_vis)
         print("\n")
-        print("Press ENTER to finish")
+        print("Press ENTER to finish or press ESC to exit without saving")
         try:
             user_input = get_key()
         except:
             user_input = ""
-        clear_terminal()
+        #clear_terminal()
 
         if user_input == "ENTER":
             max_string_length = len(length_vis)
