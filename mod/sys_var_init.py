@@ -1,0 +1,90 @@
+"""
+SYSTEM VARIABLES INITIALIZATION
+
+This code is executed at the very start when launching ACCESS. It's scope is to initialize some variables
+"""
+
+import threading
+import sys
+import os
+
+
+max_string_length = 0
+
+
+if sys.platform == "win32":
+    import msvcrt
+
+    def get_key():
+        while True:
+            key = msvcrt.getch()
+            if key == b"\x0D":  # Ctrl+M (Enter key)
+                return "ENTER"
+            return key.decode("utf-8")
+
+else:
+    import tty
+    import termios
+
+    def get_key():
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            key = sys.stdin.read(1)
+            if ord(key) == 13:
+                return "ENTER"
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return key
+
+
+def clear_terminal():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def get_max_string_length_thread():
+    global max_string_length
+    length_vis = "##########"
+    clear_terminal()
+
+    while True:
+        print(
+            "Press 'A' or 'D' to adjust the length of the string according to your window width"
+        )
+        print("Press 'SHIFT+A' or 'SHIFT+D' to quick increase the length value")
+        print("")
+        print(length_vis)
+        print("\n")
+        print("Press ENTER to finish")
+        try:
+            user_input = get_key()
+        except:
+            user_input = ""
+        clear_terminal()
+
+        if user_input == "ENTER":
+            max_string_length = len(length_vis)
+            break
+        elif user_input == "a":
+            length_vis = length_vis[: len(length_vis) - 1]
+        elif user_input == "d":
+            length_vis += "#"
+        elif user_input == "A":
+            try:
+                length_vis = length_vis[: len(length_vis) - 5]
+            except:
+                length_vis = ""
+        elif user_input == "D":
+            length_vis += "#####"
+
+
+def get_max_string_length() -> int:
+    get_max_string_length = threading.Thread(get_max_string_length_thread())
+
+    get_max_string_length.start()
+
+    # Wait for both threads to finish before exiting
+    get_max_string_length.join()
+
+    return max_string_length

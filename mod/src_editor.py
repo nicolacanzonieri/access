@@ -35,12 +35,12 @@ if sys.platform == "win32":
             key = msvcrt.getch()
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "CTRL+M"
-            elif key == b'\x11':  # Ctrl+Q
-                return 'CTRL+Q'
-            elif key == b'\x08':  # Backspace/Delete key
-                return 'DELETE'
-            elif key == b'\xe0':
-                return 'CANCEL'
+            elif key == b"\x11":  # Ctrl+Q
+                return "CTRL+Q"
+            elif key == b"\x08":  # Backspace/Delete key
+                return "DELETE"
+            elif key == b"\xe0":
+                return "CANCEL"
             return key.decode("utf-8")
 
 else:
@@ -53,15 +53,14 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
-            print(str(ord(key)))
             if ord(key) == 13:
                 return "CTRL+M"
             elif ord(key) == 17:
-                return 'CTRL+Q'
+                return "CTRL+Q"
             elif ord(key) == 127:
-                return 'DELETE'
+                return "DELETE"
             elif ord(key) == 126:
-                return 'CANCEL'
+                return "CANCEL"
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
@@ -72,18 +71,26 @@ def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
 
     if user_input == "DELETE":
         if cursor_x > 0:
-            file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x - 1] + file_vec[cursor_y][cursor_x : ]
+            file_vec[cursor_y] = (
+                file_vec[cursor_y][: cursor_x - 1] + file_vec[cursor_y][cursor_x:]
+            )
             last_key = user_input
             return [file_vec, cursor_x - 1]
         else:
             return [file_vec, cursor_x]
     elif user_input == "CANCEL":
-        file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x] + file_vec[cursor_y][cursor_x + 1 : ]
+        file_vec[cursor_y] = (
+            file_vec[cursor_y][:cursor_x] + file_vec[cursor_y][cursor_x + 1 :]
+        )
         last_key = user_input
         return [file_vec, cursor_x - 1]
     else:
         if last_key != "CANCEL":
-            file_vec[cursor_y] = file_vec[cursor_y][ : cursor_x + 1] + user_input + file_vec[cursor_y][cursor_x + 1 : ]
+            file_vec[cursor_y] = (
+                file_vec[cursor_y][: cursor_x + 1]
+                + user_input
+                + file_vec[cursor_y][cursor_x + 1 :]
+            )
             last_key = user_input
             return [file_vec, cursor_x + 1]
         else:
@@ -117,7 +124,7 @@ def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
         cursor_x -= 1
         if cursor_x < 0:
             cursor_x = 0
-    elif user_input == 'A' and mode == Mode.NAVIGATION:
+    elif user_input == "A" and mode == Mode.NAVIGATION:
         cursor_x -= 5
         if cursor_x < 0:
             cursor_x = 0
@@ -131,12 +138,12 @@ def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
                     cursor_x = 0
         except:
             None
-        
+
         if cursor_y > len(file_vec):
             cursor_y = len(file_vec)
     elif user_input == "d" and mode == Mode.NAVIGATION:
         cursor_x += 1
-    elif user_input == 'D' and mode == Mode.NAVIGATION:
+    elif user_input == "D" and mode == Mode.NAVIGATION:
         cursor_x += 5
     elif mode == Mode.EDIT:
         handler = edit_file(file_vec, user_input, cursor_x, cursor_y)
@@ -148,8 +155,10 @@ def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
 def print_editor(file_vec, mode):
     line_x_index = 0
 
-    print("[ CTRL-M : Change mode ] [ CTRL-Q : Close Editor ] [ SHIFT-A/SHIFT-D: Move faster ]\n")
-    print("MODE: " + mode.name) 
+    print(
+        "[ CTRL-M : Change mode ] [ CTRL-Q : Close Editor ] [ SHIFT-A/SHIFT-D: Move faster ]\n"
+    )
+    print("MODE: " + mode.name)
     print("\n\n\n", end="")
 
     for line_y_index, line in enumerate(file_vec):
@@ -197,7 +206,6 @@ def start(file_vec):
 
     main_logic_thread.start()
 
-    # Wait for both threads to finish before exiting
     main_logic_thread.join()
 
 
