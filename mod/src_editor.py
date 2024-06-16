@@ -12,9 +12,9 @@ import os
 
 from enum import Enum
 
+from utils.file_util import file_to_vec
 from utils.dir_util import get_path_to
-from utils.file_util import get_file, file_to_vec
-from utils.vec_util import print_matrix
+from utils.json_util import json_to_vec
 
 
 '''
@@ -32,6 +32,7 @@ mode = Mode.NAVIGATION
 cursor_x = 0
 cursor_y = 0
 last_key = ""
+max_string_lenght = json_to_vec(get_path_to("json sys_var.json"))
 
 
 '''
