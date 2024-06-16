@@ -67,7 +67,7 @@ def check(path) -> bool:
 Crate a new file in the given path
 @param "path" : a string containing the path to the new file (this path must contain the filename with extension)
 '''
-def create_file(path):
+def create_file(path, file_text):
     with open(path, "w") as new_file:
-        new_file.write("")
+        new_file.write(file_text)
         new_file.close()
