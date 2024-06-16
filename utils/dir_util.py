@@ -36,8 +36,9 @@ def get_path_to(path_to_file) -> str:
 
 
 '''
-Return a string containing the parent path for a given path
-@param "current_path" : the path where the parent folder will be extracted
+Return a string containing the parent path for a given path.
+@param current_path: The path from which the parent folder will be extracted.
+@param prnt_lvl: The level of parent directory to retrieve.
 '''
 def get_prnt_folder(current_path, prnt_lvl) -> str:
     path_len = len(current_path)

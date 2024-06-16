@@ -5,8 +5,6 @@ Branch containing the newer and better version of ACCESS
 ## To Do
 
 ### High Priority
-- [ ] Create var_utils.py
-    - [ ] Add string to int conversion
 - [ ] Add a way to edit a .json file
 - [ ] Source editor
 - [ ] TD-IDF implementation
@@ -14,7 +12,6 @@ Branch containing the newer and better version of ACCESS
 - [ ] Encrypted database
 
 ### Low Priority
-- [ ] Adjust dir_util specifications
 - [ ] Check all functions specifications
 
 ### Waiting list
