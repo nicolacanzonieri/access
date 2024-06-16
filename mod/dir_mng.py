@@ -19,4 +19,4 @@ def initialize_directory():
 
     if not check(source_path):
         print("Initializing source")
-        create_file(source_path)
+        create_file(source_path, "")
