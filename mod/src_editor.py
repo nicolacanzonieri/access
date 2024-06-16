@@ -1,7 +1,8 @@
 """
 SOURCE EDITOR
 
-This code contains functions that allows user to modify the ACCESS source without leaving the software
+This code contains a simple text editor that will be used to edit source file directly inside ACCESS, so user
+don't need to leave the software.
 """
 
 import threading
@@ -16,17 +17,26 @@ from utils.file_util import get_file, file_to_vec
 from utils.vec_util import print_matrix
 
 
+'''
+Enum containing the possible modes that the user need while editing the file
+'''
 class Mode(Enum):
     NAVIGATION = 0
     EDIT = 1
 
 
+'''
+Global variables
+'''
 mode = Mode.NAVIGATION
 cursor_x = 0
 cursor_y = 0
 last_key = ""
 
 
+'''
+Detect special keys pressed by the user
+'''
 if sys.platform == "win32":
     import msvcrt
 
@@ -66,6 +76,13 @@ else:
         return key
 
 
+'''
+Return the updated file_vec after editing it
+@param "file_vec" : list containing the file
+@param "user_input" : string containing the key that the user pressed
+@param "cursor_x" : current x position of the cursor
+@param "cursor_y" : current y position of the cursor
+'''
 def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
     global last_key
 
@@ -97,10 +114,21 @@ def edit_file(file_vec, user_input, cursor_x, cursor_y) -> list:
             return [file_vec, cursor_x + 1]
 
 
+'''
+Clear terminal
+'''
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+'''
+Return the updated file_vec after detecting user input.
+Note that this function calls "edit_file" function
+@param "file_vec" : list containing the file
+@param "user_input" : string containing the key that the user pressed
+@param "cursor_x" : current x position of the cursor
+@param "cursor_y" : current y position of the cursor
+'''
 def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
     if user_input == "CTRL+M":
         if mode == Mode.NAVIGATION:
@@ -152,6 +180,11 @@ def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
     return [file_vec, user_input, mode, cursor_x, cursor_y]
 
 
+'''
+Print the editor visualization
+@param "file_vec" : list containing the file
+@param "mode" : Mode that represent current user mode
+'''
 def print_editor(file_vec, mode):
     line_x_index = 0
 
@@ -176,6 +209,10 @@ def print_editor(file_vec, mode):
         print()
 
 
+'''
+Main logic of the software
+@param "file_vec" : list containing the file
+'''
 def main_logic(file_vec):
     global mode
     global cursor_x
@@ -201,14 +238,10 @@ def main_logic(file_vec):
             cursor_y = handler[4]
 
 
-def start(file_vec):
+def start(path_to_file):
+    file_vec = file_to_vec(path_to_file)
     main_logic_thread = threading.Thread(main_logic(file_vec))
 
     main_logic_thread.start()
 
     main_logic_thread.join()
-
-
-def test(path_to_file):
-    file_vec = file_to_vec(path_to_file)
-    start(file_vec)

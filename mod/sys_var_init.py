@@ -1,7 +1,8 @@
 """
 SYSTEM VARIABLES INITIALIZATION
 
-This code is executed at the very start when launching ACCESS. It's scope is to initialize some variables
+This code is executed at the very start when launching ACCESS. Its purpose is to initialize variables that
+the codes need
 """
 
 import threading
@@ -9,9 +10,15 @@ import sys
 import os
 
 
+'''
+Value of the max string length choosed by the user
+'''
 max_string_length = 0
 
 
+'''
+Detect special keys pressed by the user
+'''
 if sys.platform == "win32":
     import msvcrt
 
@@ -39,10 +46,16 @@ else:
         return key
 
 
+'''
+Clear terminal
+'''
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+'''
+Function started by a thread in get_max_string_length
+'''
 def get_max_string_length_thread():
     global max_string_length
     length_vis = "##########"
@@ -79,6 +92,9 @@ def get_max_string_length_thread():
             length_vis += "#####"
 
 
+'''
+Return the preferred max string length choosed by the user 
+'''
 def get_max_string_length() -> int:
     get_max_string_length = threading.Thread(get_max_string_length_thread())
 
