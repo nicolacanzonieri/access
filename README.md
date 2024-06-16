@@ -5,7 +5,6 @@ Branch containing the newer and better version of ACCESS
 ## To Do
 
 ### High Priority
-- [ ] Add a way to edit a .json file
 - [ ] Source editor
 - [ ] TD-IDF implementation
 - [ ] Custom search and tags identification algorithm
