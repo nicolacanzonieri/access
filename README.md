@@ -5,6 +5,7 @@ Branch containing the newer and better version of ACCESS
 ## To Do
 
 ### High Priority
+- [ ] Add get_json_value() to json_util in order to get a specific value from a .json file
 - [ ] Source editor
 - [ ] TD-IDF implementation
 - [ ] Custom search and tags identification algorithm
