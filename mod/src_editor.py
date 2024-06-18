@@ -14,7 +14,9 @@ from enum import Enum
 
 from utils.file_util import file_to_vec
 from utils.dir_util import get_path_to
-from utils.json_util import json_to_vec
+from utils.json_util import get_json_value
+from utils.var_util import string_to_int
+from utils.str_util import clean_str
 
 
 '''
@@ -32,7 +34,7 @@ mode = Mode.NAVIGATION
 cursor_x = 0
 cursor_y = 0
 last_key = ""
-max_string_length = json_to_vec(get_path_to("json sys_var.json"))
+max_string_length = string_to_int(get_json_value(get_path_to("json sys_var.json"), 0))
 
 
 '''
@@ -172,8 +174,12 @@ def mng_input(file_vec, user_input, mode, cursor_x, cursor_y) -> list:
             cursor_y = len(file_vec)
     elif user_input == "d" and mode == Mode.NAVIGATION:
         cursor_x += 1
+        if cursor_x >= len(file_vec[cursor_y]):
+            cursor_x = len(file_vec[cursor_y]) - 1
     elif user_input == "D" and mode == Mode.NAVIGATION:
         cursor_x += 5
+        if cursor_x >= len(file_vec[cursor_y]):
+            cursor_x = len(file_vec[cursor_y]) - 1
     elif mode == Mode.EDIT:
         handler = edit_file(file_vec, user_input, cursor_x, cursor_y)
         file_vec = handler[0]
@@ -195,6 +201,15 @@ def print_editor(file_vec, mode):
     print("MODE: " + mode.name)
     print("\n\n\n", end="")
 
+    fixed_file_vec = []
+    for line_y_index, line in enumerate(file_vec):
+        if len(line) > max_string_length:
+            fixed_file_vec.append(line[ : max_string_length])
+            fixed_file_vec.append(clean_str(line[max_string_length : ]))
+        else:
+            fixed_file_vec.append(file_vec[line_y_index])
+    file_vec = fixed_file_vec
+        
     for line_y_index, line in enumerate(file_vec):
         print(line)
         blank_line_index = 0
