@@ -3,6 +3,14 @@ SYSTEM VARIABLES INITIALIZATION
 
 This code is executed at the very start when launching ACCESS. Its purpose is to initialize variables that
 the codes need
+
+
+Index:
+- get_key()
+- clear_terminal()
+- get_max_string_length_thread()
+- init_max_string_length()
+
 """
 
 import threading

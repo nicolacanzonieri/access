@@ -2,6 +2,11 @@
 DIRECTORY MANAGER
 
 This code contains functions that are used to initialize and verify that all the files that ACCESS needs exists
+
+
+Index:
+- initialize_directory()
+
 '''
 
 

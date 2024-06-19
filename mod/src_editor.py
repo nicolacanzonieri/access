@@ -3,6 +3,17 @@ SOURCE EDITOR
 
 This code contains a simple text editor that will be used to edit source file directly inside ACCESS, so user
 don't need to leave the software.
+
+
+Index:
+- get_key()
+- edit_file()
+- clear_terminal()
+- mng_input()
+- print_editor()
+- main_logic()
+- start_src_editor()
+
 """
 
 import threading
@@ -254,7 +265,7 @@ def main_logic(file_vec):
             cursor_y = handler[4]
 
 
-def start(path_to_file):
+def start_src_editor(path_to_file):
     file_vec = file_to_vec(path_to_file)
     main_logic_thread = threading.Thread(main_logic(file_vec))
 
