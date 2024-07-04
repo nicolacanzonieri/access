@@ -4,6 +4,7 @@ STR UTIL
 Index:
 - clean_str()
 - str_to_char_list()
+- str_to_vec()
 '''
 
 
@@ -43,3 +44,25 @@ def str_to_char_list(string) -> list:
         char_list.append(string[str_index : (str_index + 1)])
         str_index += 1
     return char_list
+    
+
+'''
+Return a list where each element is a sentence that in the string ends with the "new line feed" character.
+@param "string" : the interested string
+'''
+def str_to_vec(string) -> list:
+    str_vec = []
+    sub_file_line = ""
+    char_index = 0
+
+    if string[len(string) - 1 : len(string)] != "\n":
+        string += "\n"
+
+    while char_index < len(string):
+        if string[char_index : char_index + 1] != "\n":
+            sub_file_line += string[char_index : char_index + 1]
+        else:
+            str_vec.append(sub_file_line)
+            sub_file_line = ""
+        char_index += 1
+    return str_vec
