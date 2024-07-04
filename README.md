@@ -4,6 +4,9 @@ Branch containing the newer and better version of ACCESS
 
 ## To Do
 
+### Instant Tasks
+- [ ] While in Edit Mode in Source Editor only approved keys must be considered 
+
 ### High Priority
 - [ ] Source editor
 - [ ] TD-IDF implementation
