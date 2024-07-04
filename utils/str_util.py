@@ -3,12 +3,13 @@ STR UTIL
 
 Index:
 - clean_str()
+- str_to_char_list()
 '''
 
 
 '''
 Return a string cleaned from the following "mistakes":
-- Spaces at the start of the string
+ - Spaces at the start of the string
 
 @param "string" : a string to clean
 '''
@@ -29,3 +30,16 @@ def clean_str(string) -> str:
             better_str += string[str_index : str_index + 1]
         str_index += 1
     return better_str
+
+
+'''
+Return a vector where each cell is a character of a given string
+@param "string" : the interested string
+'''
+def str_to_char_list(string) -> list:
+    char_list = []
+    str_index = 0
+    while str_index < len(string):
+        char_list.append(string[str_index : (str_index + 1)])
+        str_index += 1
+    return char_list
