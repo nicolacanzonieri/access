@@ -11,45 +11,36 @@ Index:
 
 from utils.char_util import its_a_letter, its_a_number
 from utils.vec_util import print_vec
-from utils.str_util import clean_str
+from utils.str_util import str_to_vec
 from utils.file_util import file_to_vec, vec_to_file
 
 
 '''
 Returns a vector with the elements of a JSON file.
 @param path_to_json: the path to a specific JSON file.
+
+NOTE:
+At the moment json_to_vec does not support lists in JSON files
 '''
 def json_to_vec(path_to_json) -> list:
     json_vec = []
-    its_data = False
-    push_to_subvec = False
-
+    json_data = ""
+    
     with open(path_to_json, "r") as json_file:
-        line = json_file.read() # line is a string that contains the whole json file
-        json_data = "" # Initialize json_data
-        json_subvec = [] # Initialize json sub-vector
-
-        for char in line: # Analyze each character of the json file
-            if (its_a_letter(char) or its_a_number(char) or char == ' ') and its_data: # Current char it's part of a data
-                json_data += str(char)
-            elif char == ':': # The following chars are part of a data
-                its_data = True
-            elif char == '[': # There is a vector inside the JSON file
-                push_to_subvec = True
-                json_subvec = []
-            elif char == "]": # End of the vector
-                its_data = False
-                push_to_subvec = False
-                json_vec.append(json_subvec)
-            elif char == chr(10): # Current char is NEW LINE FEED
-                if clean_str(json_data) != "":
-                    if push_to_subvec:
-                        json_subvec.append(clean_str(json_data))
-                        json_data = ""
-                    else:
-                        json_vec.append(clean_str(json_data))
-                        json_data = ""
-                        its_data = False
+        line = json_file.read()
+        line_vec = str_to_vec(line)
+        vec_index = 0
+        while vec_index < len(line_vec):
+            line_len = len(line_vec[vec_index])
+            line_index = line_len - 1
+            while line_index >= 3:
+                line = line_vec[vec_index]   
+                if line[line_index : line_index + 1] == '"' and line[line_index-3 : line_index - 2] == '"':
+                    json_vec.append(line_vec[vec_index][line_index + 1 : line_len-2])
+                    break
+                line_index -= 1
+            vec_index += 1
+        
     return json_vec
 
 

@@ -36,13 +36,8 @@ Return the index where a given value is located inside a vec
 def find_value_in_vec(val, vec) -> int:
     index = 0
     while index < len(vec):
-        try {
-        	if vec[index] == val:
-                return index
-        } except {
-        	print("FIND_VALUE_IN_VEC")
-            print("Can't compare given val with vec values")
-            return -1
-        }
-        index += 1
+        if vec[index] == val: 
+            return index
+        else:
+        	index += 1
     return -1

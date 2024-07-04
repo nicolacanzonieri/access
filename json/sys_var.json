@@ -1,5 +1,5 @@
 {
-	"SOURCE EDITOR" : "====================================================================================",
-	"max string length" : "100",
-	"edit mode keys" : "qwertyuiopasdfghjklzxcvbnm1234567890'?^\|[]+*@#,;.:_- "
+	"SOURCE EDITOR VARIABLES": "",
+	"max string length": "100",
+	"edit mode keys": "qwertyuiopasdfghjklzxcvbnm1234567890",
 }
