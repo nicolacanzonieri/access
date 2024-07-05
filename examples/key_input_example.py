@@ -33,10 +33,15 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
-            if ord(key) == 13:
+            print(ord(key))
+            if ord(key) == 9:
+                return "CTRL+I"
+            elif ord(key) == 12:
+                return "CTRL+L"
+            elif ord(key) == 13:
                 return "CTRL+M"
-            elif ord(key) == 17:
-                return "CTRL+Q"
+            elif ord(key) == 10:
+                return "CTRL+J"
             elif ord(key) == 23:
                 return "CTRL+W"
             elif ord(key) == 127:
@@ -59,6 +64,4 @@ def start_example():
         
         # USER INPUT HANDLER
         if user_input == "CTRL+W":
-            break
-        elif user_input == "CTRL+Q":
             break
