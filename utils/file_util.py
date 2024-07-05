@@ -3,7 +3,7 @@ FILE UTIL
 
 Index:
 - print_file()
-- get_file()
+- file_to_str()
 - file_to_vec()
 - vec_to_file()
 '''
@@ -26,7 +26,7 @@ def print_file(path_to_file):
 Return a string containing a text file located on a specified path
 @param "path_to_file" : a string containing the path to a file
 '''
-def get_file(path_to_file) -> str:
+def file_to_str(path_to_file) -> str:
     with open(path_to_file, "r") as file:
         file_lines = file.read()
         return file_lines
@@ -37,7 +37,7 @@ Return a list where each element is a sentence that in the file ends with the "n
 @param "path_to_file" : a string containing the path to a file
 '''
 def file_to_vec(path_to_file) -> list:
-    file_line = get_file(path_to_file)
+    file_line = file_to_str(path_to_file)
     file_vec = []
     sub_file_line = ""
     char_index = 0

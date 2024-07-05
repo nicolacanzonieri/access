@@ -2,10 +2,5 @@
 	"nome": "Mario Rossi",
 	"eta": "30",
 	"citta": "Roma",
-	"amici": [
-		"Luigi",
-		"Maria",
-		"Giovanni"
-	],
-	"valore": "6"
+	"valore": "6",
 }

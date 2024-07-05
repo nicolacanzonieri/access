@@ -5,13 +5,20 @@ This code is executed at the very start when launching ACCESS. Its purpose is to
 the codes need
 
 
+HOW THIS CODE WORKS:
+init_max_string_length() -------> get_max_string_length_thread() ----
+                                                          ^          |
+                                                          |          |
+                                                          |__________|
+
+
 Index:
 - get_key()
 - clear_terminal()
 - get_max_string_length_thread()
 - init_max_string_length()
-
 """
+
 
 import threading
 import sys
@@ -21,15 +28,15 @@ import os
 from utils.json_util import edit_json
 
 
-'''
+"""
 Value of the max string length choosed by the user
-'''
+"""
 max_string_length = 0
 
 
-'''
+"""
 Detect special keys pressed by the user
-'''
+"""
 if sys.platform == "win32":
     import msvcrt
 
@@ -38,7 +45,7 @@ if sys.platform == "win32":
             key = msvcrt.getch()
             if key == b"\x0D":  # Ctrl+M (Enter key)
                 return "ENTER"
-            if key == b'\x1b':
+            if key == b"\x1b":
                 return "ESCAPE"
             return key.decode("utf-8")
 
@@ -61,16 +68,16 @@ else:
         return key
 
 
-'''
+"""
 Clear terminal
-'''
+"""
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-'''
+"""
 Function started by a thread in get_max_string_length
-'''
+"""
 def get_max_string_length_thread():
     global max_string_length
     length_vis = "##########"
@@ -109,9 +116,9 @@ def get_max_string_length_thread():
             length_vis += "#####"
 
 
-'''
+"""
 Return the preferred max string length choosed by the user 
-'''
+"""
 def init_max_string_length(path_to_json):
     get_max_string_length = threading.Thread(get_max_string_length_thread())
 
@@ -121,4 +128,4 @@ def init_max_string_length(path_to_json):
     get_max_string_length.join()
 
     if max_string_length != 0:
-        edit_json(path_to_json, 1, '"' + str(max_string_length) + '"')
+        edit_json(path_to_json, 2, '"' + str(max_string_length) + '"')
