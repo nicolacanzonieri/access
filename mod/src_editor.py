@@ -166,7 +166,7 @@ def main_logic(file_vec, cursor_x, cursor_y):
         clear_terminal()
 
         # USER INPUT HANDLER
-        if user_input == "CTRL+Q":
+        if user_input == "CTRL+W":
             break
 
 
