@@ -14,6 +14,7 @@ Branch containing the newer and better version of ACCESS
 - [ ] TD-IDF implementation
 - [ ] Custom search and tags identification algorithm
 - [ ] Encrypted database
+- [ ] Nice visual effects
 
 ### Low Priority
 - [ ] Check all functions specifications
