@@ -5,8 +5,6 @@ Branch containing the newer and better version of ACCESS
 ## To Do
 
 ### Instant Tasks
-- [ ] Create a better key identifier for the src editor
-- [ ] Find a way to move the cursor without the need to change a "mode"
 - [ ] Add better user interface to the new src editor
 
 ### High Priority
