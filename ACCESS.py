@@ -15,7 +15,7 @@ import os
 import shutil
 import re
 
-isDesktop = False
+isDesktop = True
 spaceWindowAmount = 20
 stop_wordsFileName = "stop_words_en.txt"
 
