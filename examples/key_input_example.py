@@ -11,11 +11,19 @@ if sys.platform == "win32":
         while True:
             key = msvcrt.getch()
             print(key)
-            if key == b"\x0D":  # Ctrl+M (Enter key)
+            if key == b'\t':      # Up
+                return "CTRL+I"
+            elif key == b'\x0c':  # Right
+                return "CTRL+L"
+            elif key == b'\r':    # Down
                 return "CTRL+M"
-            elif key == b"\x11":  # Ctrl+Q
-                return "CTRL+Q"
-            elif key == b'\x17':  # Ctrl+W
+            elif key == b'\n':    # Left
+                return "CTRL+J"
+            elif key == b'\x0f':  # Fast right
+                return "CTRL+O"
+            elif key == b'\x15':  # Fast left
+                return "CTRL+U"
+            elif key == b'\x17':  # Close
                 return "CTRL+W"
             elif key == b"\x08":  # Backspace/Delete key
                 return "DELETE"
@@ -34,15 +42,15 @@ else:
             tty.setraw(fd)
             key = sys.stdin.read(1)
             print(ord(key))
-            if ord(key) == 9:
+            if ord(key) == 9:     # Up
                 return "CTRL+I"
-            elif ord(key) == 12:
+            elif ord(key) == 12:  # Right
                 return "CTRL+L"
-            elif ord(key) == 13:
+            elif ord(key) == 13:  # Down
                 return "CTRL+M"
-            elif ord(key) == 10:
+            elif ord(key) == 10:  # Left
                 return "CTRL+J"
-            elif ord(key) == 23:
+            elif ord(key) == 23:  # Close
                 return "CTRL+W"
             elif ord(key) == 127:
                 return "DELETE"
