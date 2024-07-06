@@ -5,8 +5,8 @@ SOURCE EDITOR
 Index:
 - get_key()
 - clear_terminal()
+- extend_file_vec()
 - print_cursor()
-- print_long_line()
 - print_ui()
 - input_handler()
 - main_logic()
@@ -98,6 +98,23 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+'''
+Returns a list of sentences extracted from the provided file, where each sentence is either shorter than or equal 
+to the specified maximum length. Sentences exceeding the limit are split into multiple elements.
+@param "file_vec" : The original list of strings representing file contents (potentially containing long sentences).
+'''
+def extend_file_vec(file_vec) -> list:
+    vec_index = 0
+    while vec_index < len(file_vec):
+        line = file_vec[vec_index]
+        print(line)
+        if len(line) > max_string_length:
+            file_vec[vec_index] = file_vec[vec_index][ : max_string_length]
+            file_vec.insert(vec_index + 1, line[max_string_length : ])
+        vec_index += 1
+    return file_vec
+        
+
 """
 Print the cursor line with the cursor
 @param "line" : the string that we are modifying
@@ -113,38 +130,6 @@ def print_cursor(line, cursor_x):
             print(" ", end="")
         line_index += 1
     print("")
-
-
-"""
-Print a text line that is longer than ‘max_string_length‘
-@param "file_line" : the interested text_line
-@param "is_cursor_line" : true if function have to print cursor line, false if not
-@param "cursor_x" : cursor x position
-"""
-def print_long_line(file_line, is_cursor_line, cursor_x):
-    repeater = len(file_line)/max_string_length
-
-    if is_cursor_line:
-        cursor_repeater = int(cursor_x / max_string_length)
-
-    repeater_index = 0
-    while repeater_index < repeater:
-        if repeater_index == 0:
-            temp_line = file_line[:max_string_length]
-        elif repeater_index == repeater - 1:
-            start_point = repeater_index * max_string_length
-            temp_line = file_line[start_point:]
-        else:
-            start_point = repeater_index * max_string_length
-            end_point = start_point + max_string_length
-            temp_line = file_line[start_point:end_point]
-        if is_cursor_line:
-            print(temp_line + " ~ " + str(repeater_index) + " - " + str(cursor_repeater))
-        else:
-            print(temp_line + " ~ " + str(repeater_index))
-        if is_cursor_line and repeater_index == cursor_repeater:
-            print_cursor(temp_line, cursor_x)
-        repeater_index += 1
 
 
 """
@@ -165,14 +150,11 @@ def print_ui(file_vec, cursor_x, cursor_y):
             is_cursor_line = False
 
         file_line = file_vec[file_vec_index]
+        print(file_line)
 
-        # IF LINE IS LONGER THAN THE MAX STRING LENGTH VARIABLE
-        if len(file_line) > max_string_length:
-            print_long_line(file_line, is_cursor_line, cursor_x)
-        else:
-            print(file_line)
-            if is_cursor_line:
-                print_cursor(file_line, cursor_x)
+        if is_cursor_line:
+            print_cursor(file_line, cursor_x)
+        
         file_vec_index += 1
 
 
@@ -236,6 +218,6 @@ def start_editor(path_to_file):
     cursor_x = 0
     cursor_y = 0
     # TRANSFORM FILE TO A LIST
-    file_vec = file_to_vec(path_to_file)
+    file_vec = extend_file_vec(file_to_vec(path_to_file))
     # START MAIN LOGIC
     main_logic(file_vec, cursor_x, cursor_y)
