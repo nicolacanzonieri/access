@@ -5,6 +5,8 @@ SOURCE EDITOR
 Index:
 - get_key()
 - clear_terminal()
+- print_cursor()
+- print_long_line()
 - print_ui()
 - main_logic()
 - start()
@@ -26,17 +28,29 @@ sys_var_json_path = get_path_to("json sys_var.json")
 max_string_length = str_to_int(get_json_value(sys_var_json_path, 1))
 
 
-"""
+'''
 Detect special keys pressed by the user
-"""
+'''
 if sys.platform == "win32":
     import msvcrt
 
     def get_key():
         while True:
             key = msvcrt.getch()
-            if key == b"\x11":  # Ctrl+Q
-                return "CTRL+Q"
+            if key == b'\t':      # Up
+                return "CTRL+I"
+            elif key == b'\x0c':  # Right
+                return "CTRL+L"
+            elif key == b'\r':    # Down
+                return "CTRL+M"
+            elif key == b'\n':    # Left
+                return "CTRL+J"
+            elif key == b'\x0f':  # Fast right
+                return "CTRL+O"
+            elif key == b'\x15':  # Fast left
+                return "CTRL+U"
+            elif key == b'\x17':  # Close
+                return "CTRL+W"
             elif key == b"\x08":  # Backspace/Delete key
                 return "DELETE"
             elif key == b"\xe0":
@@ -53,8 +67,20 @@ else:
         try:
             tty.setraw(fd)
             key = sys.stdin.read(1)
-            if ord(key) == 17:
-                return "CTRL+Q"
+            if ord(key) == 9:     # Up
+                return "CTRL+I"
+            elif ord(key) == 12:  # Right
+                return "CTRL+L"
+            elif ord(key) == 13:  # Down
+                return "CTRL+M"
+            elif ord(key) == 10:  # Left
+                return "CTRL+J"
+            elif ord(key) == 15:  # Fast right
+                return "CTRL+O"
+            elif ord(key) == 21:  # Fast left
+                return "CTRL+U"
+            elif ord(key) == 23:  # Close
+                return "CTRL+W"
             elif ord(key) == 127:
                 return "DELETE"
             elif ord(key) == 126:
