@@ -9,7 +9,7 @@ Index:
 - print_long_line()
 - print_ui()
 - main_logic()
-- start()
+- start_editor()
 """
 
 import sys
@@ -199,7 +199,7 @@ def main_logic(file_vec, cursor_x, cursor_y):
 """
 Start the Source Editor by giving it the path to a specific file
 """
-def start(path_to_file):
+def start_editor(path_to_file):
     # CURSOR POSITION
     cursor_x = 0
     cursor_y = 0

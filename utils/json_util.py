@@ -24,7 +24,6 @@ At the moment json_to_vec does not support lists in JSON files
 '''
 def json_to_vec(path_to_json) -> list:
     json_vec = []
-    json_data = ""
     
     with open(path_to_json, "r") as json_file:
         line = json_file.read()
@@ -33,10 +32,16 @@ def json_to_vec(path_to_json) -> list:
         while vec_index < len(line_vec):
             line_len = len(line_vec[vec_index])
             line_index = line_len - 1
-            while line_index >= 3:
+            while line_index >= 3 and vec_index < len(line_vec)-2:
                 line = line_vec[vec_index]   
-                if line[line_index : line_index + 1] == '"' and line[line_index-3 : line_index - 2] == '"':
+                if line[line_index : line_index + 1] == '"' and line[line_index-2 : line_index - 1] == ':' and line[line_index-3 : line_index - 2] == '"':
                     json_vec.append(line_vec[vec_index][line_index + 1 : line_len-2])
+                    break
+                line_index -= 1
+            while line_index >= 3 and vec_index == len(line_vec)-2:
+                line = line_vec[vec_index]   
+                if line[line_index : line_index + 1] == '"' and line[line_index - 2 : line_index - 1] == ':' and line[line_index-3 : line_index - 2] == '"':
+                    json_vec.append(line_vec[vec_index][line_index + 1 : line_len-1])
                     break
                 line_index -= 1
             vec_index += 1
