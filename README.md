@@ -5,7 +5,7 @@
 > ACCESS is not yet intended for widespread use. Its code is rough and not always precise. Please follow the `develop` branch for a better
 > version of ACCESS (still a work in progress).
 
-ACCESS is a tool that autonomously catalogs and classifies any type of txt file. To achieve this, ACCESS uses a dictionary of non-tag words (see `stop_words_it.txt`) and analyzes the document, adding the data to a local database.
+ACCESS is a tool that autonomously catalogs and classifies any type of txt file. To achieve this, ACCESS uses a dictionary of non-tag words (see `stop_words.txt`) and analyzes the document, adding the data to a local database.
 
 Once the file is saved, ACCESS can retrieve the data by simply analyzing the user's prompt.
 
