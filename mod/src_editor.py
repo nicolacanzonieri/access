@@ -8,6 +8,7 @@ Index:
 - print_cursor()
 - print_long_line()
 - print_ui()
+- input_handler()
 - main_logic()
 - start_editor()
 """
@@ -104,12 +105,14 @@ Print the cursor line with the cursor
 """
 def print_cursor(line, cursor_x):
     line_index = 0
+    
     while line_index <= len(line):
         if line_index == cursor_x:
-            print("^")
+            print("^", end="")
         else:
-            print(" ")
+            print(" ", end="")
         line_index += 1
+    print("")
 
 
 """
@@ -169,6 +172,27 @@ def print_ui(file_vec, cursor_x, cursor_y):
         file_vec_index += 1
 
 
+'''
+Return a tuple containing the new cursor position after having analyzed user input
+@param user_input: string containing pressed key/combination
+@param "cursor_x" : cursor x position
+@param "cursor_y" : cursor y position
+'''
+def input_handler(user_input, cursor_x, cursor_y) -> tuple:
+    if user_input == "CTRL+I":
+        cursor_y -= 1
+    elif user_input == "CTRL+L":
+        cursor_x += 1
+    elif user_input == "CTRL+M":
+        cursor_y += 1
+    elif user_input == "CTRL+J":
+        cursor_x -= 1
+    elif user_input == "CTRL+O":
+        cursor_x += 5
+    elif user_input == "CTRL+U":
+        cursor_x -= 5
+    return (cursor_x, cursor_y)
+
 """
 Handle the whole Source Editor
 @param "file_vec" : the list obtained from the file (file_to_vec)
@@ -194,6 +218,10 @@ def main_logic(file_vec, cursor_x, cursor_y):
         # USER INPUT HANDLER
         if user_input == "CTRL+W":
             break
+        else:
+            cursor_tuple = input_handler(user_input, cursor_x, cursor_y)
+            cursor_x = cursor_tuple[0]
+            cursor_y = cursor_tuple[1]
 
 
 """
