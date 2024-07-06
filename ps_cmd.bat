@@ -1,1 +1,0 @@
-start cmd /k cd "C:\Users\nicol\Desktop\Coding\Python\access_develop"
