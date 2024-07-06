@@ -6,7 +6,7 @@ Created by Nicola Canzonieri ~ Halo
 '''
 
 try:
-  import console
+  import console # type: ignore
 except:
   print("Couldn't resolve console importation")
 
@@ -15,7 +15,7 @@ import os
 import shutil
 import re
 
-isDesktop = True
+isDesktop = False
 spaceWindowAmount = 20
 stop_wordsFileName = "stop_words_en.txt"
 
@@ -25,6 +25,14 @@ def NewWindow():
     console.clear()
   else:
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def GetPathSeparator() -> str:
+  if (os.name == "Linux" or os.name == "Darwin") and isDesktop:
+    return "/"
+  elif os.name == "Windows" and isDesktop:
+    return "\\"
+  elif not isDesktop:
+    return "/"
 
 # Search file in specified directory
 def SearchElementInDir(database_dir, fileName):
@@ -37,34 +45,34 @@ def SearchElementInDir(database_dir, fileName):
 
 # Create ACCESS files
 def InitializeDirectory(database_dir) -> bool:
-  if not os.path.exists(os.getcwd() + "\source.txt"):
+  if not os.path.exists(os.getcwd() + GetPathSeparator() + "source.txt"):
     print("Initializing source")
     f = open("source.txt","x")
     f.close();
 
-  if not os.path.exists(os.getcwd() + "\database"):
+  if not os.path.exists(os.getcwd() + GetPathSeparator() +"database"):
     print("Initializing directory")
     os.mkdir("database")
     time.sleep(3)
-    f = open("database\data.txt","x")
+    f = open("database" + GetPathSeparator() + "data.txt","x")
     f.close();
-    f = open("database\\" + stop_wordsFileName,"x")
+    f = open("database" + GetPathSeparator() + stop_wordsFileName,"x")
     f.close();
-    f = open("database\supertags.txt","x")
+    f = open("database" + GetPathSeparator() + "supertags.txt","x")
     f.close();
     return True
   else :
-    if not os.path.exists(os.getcwd() + "\database\data.txt"):
+    if not os.path.exists(os.getcwd() + GetPathSeparator() + "database" + GetPathSeparator() + "data.txt"):
       print("Initializing database")
-      f = open("database\data.txt","x")
+      f = open("database" + GetPathSeparator() + "data.txt","x")
       f.close();
 
-    if not os.path.exists(os.getcwd() + "\database\supertags.txt"):
+    if not os.path.exists(os.getcwd() + GetPathSeparator() + "database" + GetPathSeparator() + "supertags.txt"):
       print("Initializing supertags database")
-      f = open("database\supertags.txt","x")
+      f = open("database" + GetPathSeparator() + "supertags.txt","x")
       f.close();
     
-    if not os.path.exists(os.getcwd() + "\database\\" + stop_wordsFileName):
+    if not os.path.exists(os.getcwd() + GetPathSeparator() + "database" + GetPathSeparator() + stop_wordsFileName):
       while True:
         NewWindow()
         print("ERROR: stop_words database not found!\n\n\n")
@@ -74,7 +82,7 @@ def InitializeDirectory(database_dir) -> bool:
 
         if user_input == "1":
           print("Initializing stop words database")
-          f = open("database\\" + stop_wordsFileName,"x")
+          f = open("database"+ GetPathSeparator() + stop_wordsFileName,"x")
           f.close();
           return True
         elif user_input == "2":
@@ -85,7 +93,6 @@ def InitializeDirectory(database_dir) -> bool:
           time.sleep(3)
 
     return True
-          
 
 # Create a new file in specified directory
 def CreateFile(database_dir, fileName):
@@ -300,6 +307,23 @@ def LearnTags(tag, tag_array, database_dir):
   
   return tag_array
 
+def LearnTagsQuick(rm_tags, tag_array, database_dir):
+  rm_tags_array = rm_tags.split()
+  j = 0
+  while j < len(rm_tags_array):
+    i = 0
+    while i < len(tag_array):
+      if CompareStrings(rm_tags_array[j], tag_array[i]):
+        SaveStopWords(rm_tags_array[j], database_dir)
+        tag_array.pop(i)
+        i -= 1
+        break
+      
+      i += 1
+    j += 1
+  
+  return tag_array
+
 # Train ACCESS tag finder by removing wrong tags
 def TrainTags(database_dir):
   text = ReadAndNormalize(database_dir)
@@ -321,6 +345,26 @@ def TrainTags(database_dir):
     else:
       tag_array = LearnTags(answer, tag_array, database_dir)
  
+def QuickTrainTags(database_dir):
+  text = ReadAndNormalize(database_dir)
+  data_array = FindTitleAndData(text)
+  data_array[0] = RemoveLineFeed(data_array[0]) # TITLE
+  data_array[1] = RemoveLineFeed(data_array[1]) # DATA BODY
+  tag_array = RemoveDuplicateTags(DetectTags(RemovePunctuation(data_array[1]), database_dir))
+  while True:
+    NewWindow()
+    print("I have found this tags in the source file:\n")
+    print("TAGS: ", end = "")
+    print(tag_array)
+    print("\n\n\n")
+    answer = input("Insert tag to remove or !end! to quit: ")
+    
+    if answer == "!end!":
+      print("\n\n\nend")
+      break
+    else:
+      tag_array = LearnTagsQuick(answer, tag_array, database_dir)
+
 # Add data to ACCESS database
 def Train(database_dir):
   text = ReadAndNormalize(database_dir)
@@ -526,7 +570,7 @@ def NormalAnswer(question, results_array, database_dir):
   print("Database lines: ")
   print(tag_lines)
   print("\n")
-  print("Database lines (more specified): ")
+  print("Database lines (more specific): ")
   print(tag_lines_temp)
   print("\n")
   print("Database best answer: " + str(best_result))
@@ -612,15 +656,16 @@ def SearchForSubject(question, results_array, database_dir):
 def ShowHelpCommands():
   print("This are the developer commands that allows you to fully interact with me!")
   print("Remember to use this functions only when you know what are you doing!\n\n\n")
-  print("help:       Show developer commands")
-  print("learn:      Add data to ACCESS database'")
-  print("train tags: Train ACCESS tags identification")
+  print("help:             Show developer commands")
+  print("learn:            Add data to ACCESS database'")
+  print("train tags:       Train ACCESS tags identification")
+  print("quick train tags: Train ACCESS tags identification in a faster way")
 
   input()
 
 def main():
   current_dir = os.getcwd()
-  database_dir = current_dir + "\database\\"
+  database_dir = current_dir + GetPathSeparator() + "database" + GetPathSeparator()
   
   results_array = []
   initialization_result = InitializeDirectory(database_dir)
@@ -639,9 +684,10 @@ def main():
       Train(database_dir)
     elif question == "train tags":
       TrainTags(database_dir)
+    elif question == "quick train tags":
+      QuickTrainTags(database_dir)
     elif question == "debug":
       # Used only for debug purpose
-      InitializeDirectory(database_dir)
       input()
     elif question == "!end!":
       break
