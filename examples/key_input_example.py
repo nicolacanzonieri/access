@@ -50,6 +50,10 @@ else:
                 return "CTRL+M"
             elif ord(key) == 10:  # Left
                 return "CTRL+J"
+            elif ord(key) == 15:  # Fast right
+                return "CTRL+O"
+            elif ord(key) == 21:  # Fast left
+                return "CTRL+U"
             elif ord(key) == 23:  # Close
                 return "CTRL+W"
             elif ord(key) == 127:
