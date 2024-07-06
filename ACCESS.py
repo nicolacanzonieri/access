@@ -27,12 +27,10 @@ def NewWindow():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def GetPathSeparator() -> str:
-  if (os.name == "Linux" or os.name == "Darwin") and isDesktop:
-    return "/"
-  elif os.name == "Windows" and isDesktop:
-    return "\\"
-  elif not isDesktop:
-    return "/"
+	if not isDesktop:
+		return "\\"  
+	else:
+		return os.sep
 
 # Search file in specified directory
 def SearchElementInDir(database_dir, fileName):
