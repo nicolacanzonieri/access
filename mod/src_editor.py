@@ -118,27 +118,31 @@ def print_cursor(line, cursor_x):
 """
 Print a text line that is longer than ‘max_string_length‘
 @param "file_line" : the interested text_line
-@param "cursor_line" : true if function have to print cursor line, false if not
+@param "is_cursor_line" : true if function have to print cursor line, false if not
 @param "cursor_x" : cursor x position
 """
 def print_long_line(file_line, is_cursor_line, cursor_x):
-    repeater = int(len(file_line) / max_string_length)
-    cursor_repeater = int(cursor_x / max_string_length) - 1
+    repeater = len(file_line)/max_string_length
+
+    if is_cursor_line:
+        cursor_repeater = int(cursor_x / max_string_length)
+
     repeater_index = 0
     while repeater_index < repeater:
         if repeater_index == 0:
             temp_line = file_line[:max_string_length]
-            print(temp_line)
         elif repeater_index == repeater - 1:
             start_point = repeater_index * max_string_length
             temp_line = file_line[start_point:]
-            print(temp_line)
         else:
             start_point = repeater_index * max_string_length
             end_point = start_point + max_string_length
             temp_line = file_line[start_point:end_point]
-            print(temp_line)
-        if repeater_index == cursor_repeater:
+        if is_cursor_line:
+            print(temp_line + " ~ " + str(repeater_index) + " - " + str(cursor_repeater))
+        else:
+            print(temp_line + " ~ " + str(repeater_index))
+        if is_cursor_line and repeater_index == cursor_repeater:
             print_cursor(temp_line, cursor_x)
         repeater_index += 1
 
