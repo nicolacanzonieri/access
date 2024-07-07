@@ -39,19 +39,19 @@ if sys.platform == "win32":
         while True:
             key = msvcrt.getch()
             if key == b'\t':      # Up
-                return "CTRL+I"
+                return "CTRL+i"
             elif key == b'\x0c':  # Right
-                return "CTRL+L"
-            elif key == b'\r':    # Down
-                return "CTRL+M"
+                return "CTRL+l"
+            elif key == b'\x0b':  # Down
+                return "CTRL+k"
             elif key == b'\n':    # Left
-                return "CTRL+J"
+                return "CTRL+j"
             elif key == b'\x0f':  # Fast right
-                return "CTRL+O"
+                return "CTRL+o"
             elif key == b'\x15':  # Fast left
-                return "CTRL+U"
+                return "CTRL+u"
             elif key == b'\x17':  # Close
-                return "CTRL+W"
+                return "CTRL+w"
             elif key == b"\x08":  # Backspace/Delete key
                 return "DELETE"
             elif key == b"\xe0":
@@ -69,19 +69,19 @@ else:
             tty.setraw(fd)
             key = sys.stdin.read(1)
             if ord(key) == 9:     # Up
-                return "CTRL+I"
+                return "CTRL+i"
             elif ord(key) == 12:  # Right
-                return "CTRL+L"
-            elif ord(key) == 13:  # Down
-                return "CTRL+M"
+                return "CTRL+l"
+            elif ord(key) == 11:  # Down
+                return "CTRL+k"
             elif ord(key) == 10:  # Left
-                return "CTRL+J"
+                return "CTRL+j"
             elif ord(key) == 15:  # Fast right
-                return "CTRL+O"
+                return "CTRL+o"
             elif ord(key) == 21:  # Fast left
-                return "CTRL+U"
+                return "CTRL+u"
             elif ord(key) == 23:  # Close
-                return "CTRL+W"
+                return "CTRL+w"
             elif ord(key) == 127:
                 return "DELETE"
             elif ord(key) == 126:
@@ -164,20 +164,44 @@ Return a tuple containing the new cursor position after having analyzed user inp
 @param "cursor_x" : cursor x position
 @param "cursor_y" : cursor y position
 '''
-def input_handler(user_input, cursor_x, cursor_y) -> tuple:
-    if user_input == "CTRL+I":
+def input_handler(user_input, cursor_x, cursor_y, file_vec) -> tuple:
+    if user_input == "CTRL+i":
         cursor_y -= 1
-    elif user_input == "CTRL+L":
+    elif user_input == "CTRL+l":
         cursor_x += 1
-    elif user_input == "CTRL+M":
+    elif user_input == "CTRL+k":
         cursor_y += 1
-    elif user_input == "CTRL+J":
+    elif user_input == "CTRL+j":
         cursor_x -= 1
-    elif user_input == "CTRL+O":
+    elif user_input == "CTRL+o":
         cursor_x += 5
-    elif user_input == "CTRL+U":
+    elif user_input == "CTRL+u":
         cursor_x -= 5
+    return fix_cursor_position(file_vec, cursor_x, cursor_y)
+
+
+'''
+Adjust cursor position if this last one is outside text line boundaries
+@param "file_vec" : the list obtained from the file (file_to_vec)
+@param "cursor_x" : cursor x position
+@param "cursor_y" : cursor y position
+'''
+def fix_cursor_position(file_vec, cursor_x, cursor_y) -> tuple:
+    try:
+        file_line = file_vec[cursor_y]
+    except:
+        file_line = file_vec[cursor_y - 1]
+    
+    if cursor_x < 0:
+        cursor_x = 0
+    if  cursor_x > len(file_line):
+        cursor_x = len(file_line)
+    if cursor_y < 0:
+        cursor_y = 0
+    elif cursor_y >= len(file_vec):
+        cursor_y = len(file_vec) - 1
     return (cursor_x, cursor_y)
+
 
 """
 Handle the whole Source Editor
@@ -202,10 +226,10 @@ def main_logic(file_vec, cursor_x, cursor_y):
         clear_terminal()
 
         # USER INPUT HANDLER
-        if user_input == "CTRL+W":
+        if user_input == "CTRL+w":
             break
         else:
-            cursor_tuple = input_handler(user_input, cursor_x, cursor_y)
+            cursor_tuple = input_handler(user_input, cursor_x, cursor_y, file_vec)
             cursor_x = cursor_tuple[0]
             cursor_y = cursor_tuple[1]
 

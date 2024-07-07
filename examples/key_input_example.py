@@ -11,20 +11,21 @@ if sys.platform == "win32":
         while True:
             key = msvcrt.getch()
             print(key)
+            print(ord(key))
             if key == b'\t':      # Up
-                return "CTRL+I"
+                return "CTRL+i"
             elif key == b'\x0c':  # Right
-                return "CTRL+L"
-            elif key == b'\r':    # Down
-                return "CTRL+M"
+                return "CTRL+l"
+            elif key == b'\x0b':  # Down
+                return "CTRL+k"
             elif key == b'\n':    # Left
-                return "CTRL+J"
+                return "CTRL+j"
             elif key == b'\x0f':  # Fast right
-                return "CTRL+O"
+                return "CTRL+o"
             elif key == b'\x15':  # Fast left
-                return "CTRL+U"
+                return "CTRL+u"
             elif key == b'\x17':  # Close
-                return "CTRL+W"
+                return "CTRL+w"
             elif key == b"\x08":  # Backspace/Delete key
                 return "DELETE"
             elif key == b"\xe0":
@@ -43,19 +44,19 @@ else:
             key = sys.stdin.read(1)
             print(ord(key))
             if ord(key) == 9:     # Up
-                return "CTRL+I"
+                return "CTRL+i"
             elif ord(key) == 12:  # Right
-                return "CTRL+L"
-            elif ord(key) == 13:  # Down
-                return "CTRL+M"
+                return "CTRL+l"
+            elif ord(key) == 11:  # Down
+                return "CTRL+k"
             elif ord(key) == 10:  # Left
-                return "CTRL+J"
+                return "CTRL+j"
             elif ord(key) == 15:  # Fast right
-                return "CTRL+O"
+                return "CTRL+o"
             elif ord(key) == 21:  # Fast left
-                return "CTRL+U"
+                return "CTRL+u"
             elif ord(key) == 23:  # Close
-                return "CTRL+W"
+                return "CTRL+w"
             elif ord(key) == 127:
                 return "DELETE"
             elif ord(key) == 126:
@@ -64,7 +65,7 @@ else:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key
 
-def start_example():
+def start_key_input_example():
     while True:
         # USER KEY GETTER
         try:
@@ -75,5 +76,5 @@ def start_example():
         print(user_input)
         
         # USER INPUT HANDLER
-        if user_input == "CTRL+W":
+        if user_input == "CTRL+w":
             break
