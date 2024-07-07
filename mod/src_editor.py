@@ -181,7 +181,7 @@ def input_handler(user_input, cursor_x, cursor_y, file_vec) -> tuple:
 
 
 '''
-Adjust cursor position if this last one is outside text line boundaries
+Return fixed cursor position if it is not inside the text boundaries 
 @param "file_vec" : the list obtained from the file (file_to_vec)
 @param "cursor_x" : cursor x position
 @param "cursor_y" : cursor y position
