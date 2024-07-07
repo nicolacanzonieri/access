@@ -5,6 +5,7 @@ Branch containing the newer and better version of ACCESS
 ## To Do
 
 ### Instant Tasks
+- [ ] Start working on a "key-approver" for the src_editor
 - [ ] Add better user interface to the new src editor
 
 ### High Priority
