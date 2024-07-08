@@ -2,21 +2,31 @@ import sys
 import os
 
 
-banned_keys = []
-def detect_banned_key(key):
-    global banned_keys
-    if ord(key) == 224 and len(banned_keys) == 0:
-        banned_keys.append(ord(key))
-        print("CHECK 1")
+sus_key_received = False 
+
+
+'''
+Detect if the user pressed an arrow key and return it if this happend.
+@param "key" : the pressed key
+'''
+def detect_arrow_key(key):
+    global sus_key_received
+    if ord(key) == 224 and not sus_key_received:
+        sus_key_received = True
         return None
-    elif (ord(key) == 72 or ord(key) == 77 or ord(key) == 80 or ord(key) == 75) and len(banned_keys) == 1:
-        print("CHECK 2 - POSITIVE")
-        banned_keys = []
-        return True
-    else:
-        print("CHECK 2 - NEGATIVE")
-        banned_keys = []
-        return False
+    elif ord(key) == 72 and sus_key_received:
+        sus_key_received = False
+        return "ARROW UP"
+    elif ord(key) == 77 and sus_key_received:
+        sus_key_received = False
+        return "ARROW RIGHT"
+    elif ord(key) == 80 and sus_key_received:
+        sus_key_received = False
+        return "ARROW DOWN"
+    elif ord(key) == 75 and sus_key_received:
+        sus_key_received = False
+        return "ARROW LEFT"
+    return ""
 
 
 '''
@@ -32,26 +42,28 @@ if sys.platform == "win32":
             print(ord(key), end=" ~ ")
             print(key, end=" ~ ")
             print(chr(ord(key)))
-            key_check = detect_banned_key(key)
-            if key == b'\t' and key_check == False:      # Up
+            arrow_key = detect_arrow_key(key)
+            if key == b'\t' and arrow_key == None:      # Up
                 return "CTRL+i"
-            elif key == b'\x0c' and key_check == False:  # Right
+            elif key == b'\x0c' and arrow_key == None:  # Right
                 return "CTRL+l"
-            elif key == b'\x0b' and key_check == False:  # Down
+            elif key == b'\x0b' and arrow_key == None:  # Down
                 return "CTRL+k"
-            elif key == b'\n' and key_check == False:    # Left
+            elif key == b'\n' and arrow_key == None:    # Left
                 return "CTRL+j"
-            elif key == b'\x0f' and key_check == False:  # Fast right
+            elif key == b'\x0f' and arrow_key == None:  # Fast right
                 return "CTRL+o"
-            elif key == b'\x15' and key_check == False:  # Fast left
+            elif key == b'\x15' and arrow_key == None:  # Fast left
                 return "CTRL+u"
-            elif key == b'\x17' and key_check == False:  # Close
+            elif key == b'\x17' and arrow_key == None:  # Close
                 return "CTRL+w"
-            elif key == b"\x08" and key_check == False:  # Backspace/Delete key
+            elif key == b"\x08" and arrow_key == None:  # Backspace/Delete key
                 return "DELETE"
-            elif key == b"\xe0" and key_check == False:
+            elif key == b"\xe0" and arrow_key == None:
                 return "CANCEL"
-            elif key_check == False:
+            elif arrow_key != None:
+                return arrow_key
+            elif arrow_key == "":
                 return key.decode("utf-8")
 
 else:
