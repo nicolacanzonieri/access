@@ -1,4 +1,4 @@
-"""
+'''
 SOURCE EDITOR
 
 
@@ -11,7 +11,7 @@ Index:
 - input_handler()
 - main_logic()
 - start_editor()
-"""
+'''
 
 import sys
 import os
@@ -22,17 +22,17 @@ from utils.dir_util import get_path_to
 from utils.str_util import str_to_int
 
 
-"""
+'''
 SYSTEM VARIABLES
-"""
+'''
 sys_var_json_path = get_path_to("json sys_var.json")
 max_string_length = str_to_int(get_json_value(sys_var_json_path, 1))
 
 
-'''
-Detect special keys pressed by the user
-'''
 if sys.platform == "win32":
+    '''
+    Detect special keys pressed by the user
+    '''
     import msvcrt
 
     def get_key():
@@ -91,19 +91,21 @@ else:
         return key
 
 
-"""
-Clear terminal
-"""
 def clear_terminal():
+    '''
+    Clear terminal
+    '''
     os.system("cls" if os.name == "nt" else "clear")
 
 
-'''
-Returns a list of sentences extracted from the provided file, where each sentence is either shorter than or equal 
-to the specified maximum length. Sentences exceeding the limit are split into multiple elements.
-@param "file_vec" : The original list of strings representing file contents (potentially containing long sentences).
-'''
 def extend_file_vec(file_vec) -> list:
+    '''
+    Returns a list of sentences extracted from the provided file, where each sentence is either shorter than
+    or equal to the specified maximum length. Sentences exceeding the limit are split into multiple elements.
+
+    @param "file_vec" : The original list of strings representing file contents (potentially containing long 
+    sentences).
+    '''
     vec_index = 0
     while vec_index < len(file_vec):
         line = file_vec[vec_index]
@@ -115,12 +117,13 @@ def extend_file_vec(file_vec) -> list:
     return file_vec
         
 
-"""
-Print the cursor line with the cursor
-@param "line" : the string that we are modifying
-@param "cursor_x" : the cursor x position
-"""
 def print_cursor(line, cursor_x):
+    '''
+    Print the cursor line with the cursor
+    
+    @param "line" : the string that we are modifying
+    @param "cursor_x" : the cursor x position
+    '''
     line_index = 0
     
     while line_index <= len(line):
@@ -132,13 +135,14 @@ def print_cursor(line, cursor_x):
     print("")
 
 
-"""
-Print UI
-@param "file_vec" : the list obtained from the file (file_to_vec)
-@param "cursor_x" : cursor x position
-@param "cursor_y" : cursor y position
-"""
 def print_ui(file_vec, cursor_x, cursor_y):
+    '''
+    Print UI
+    
+    @param "file_vec" : the list obtained from the file (file_to_vec)
+    @param "cursor_x" : cursor x position
+    @param "cursor_y" : cursor y position
+    '''
     file_vec_len = len(file_vec)
     file_vec_index = 0
 
@@ -158,13 +162,14 @@ def print_ui(file_vec, cursor_x, cursor_y):
         file_vec_index += 1
 
 
-'''
-Return a tuple containing the new cursor position after having analyzed user input
-@param user_input: string containing pressed key/combination
-@param "cursor_x" : cursor x position
-@param "cursor_y" : cursor y position
-'''
 def input_handler(user_input, cursor_x, cursor_y, file_vec) -> tuple:
+    '''
+    Return a tuple containing the new cursor position after having analyzed user input
+    
+    @param user_input: string containing pressed key/combination
+    @param "cursor_x" : cursor x position
+    @param "cursor_y" : cursor y position
+    '''
     if user_input == "CTRL+i":
         cursor_y -= 1
     elif user_input == "CTRL+l":
@@ -180,13 +185,14 @@ def input_handler(user_input, cursor_x, cursor_y, file_vec) -> tuple:
     return fix_cursor_position(file_vec, cursor_x, cursor_y)
 
 
-'''
-Adjust cursor position if this last one is outside text line boundaries
-@param "file_vec" : the list obtained from the file (file_to_vec)
-@param "cursor_x" : cursor x position
-@param "cursor_y" : cursor y position
-'''
 def fix_cursor_position(file_vec, cursor_x, cursor_y) -> tuple:
+    '''
+    Adjust cursor position if this last one is outside text line boundaries
+    
+    @param "file_vec" : the list obtained from the file (file_to_vec)
+    @param "cursor_x" : cursor x position
+    @param "cursor_y" : cursor y position
+    '''
     try:
         file_line = file_vec[cursor_y]
     except:
@@ -203,13 +209,14 @@ def fix_cursor_position(file_vec, cursor_x, cursor_y) -> tuple:
     return (cursor_x, cursor_y)
 
 
-"""
-Handle the whole Source Editor
-@param "file_vec" : the list obtained from the file (file_to_vec)
-@param "cursor_x" : cursor x position
-@param "cursor_y" : cursor y position
-"""
 def main_logic(file_vec, cursor_x, cursor_y):
+    '''
+    Handle the whole Source Editor
+
+    @param "file_vec" : the list obtained from the file (file_to_vec)
+    @param "cursor_x" : cursor x position
+    @param "cursor_y" : cursor y position
+    '''
     # PREPARE TO LAUNCH SOURCE EDITOR
     clear_terminal()
 
@@ -234,10 +241,10 @@ def main_logic(file_vec, cursor_x, cursor_y):
             cursor_y = cursor_tuple[1]
 
 
-"""
-Start the Source Editor by giving it the path to a specific file
-"""
 def start_editor(path_to_file):
+    '''
+    Start the Source Editor by giving it the path to a specific file
+    '''
     # CURSOR POSITION
     cursor_x = 0
     cursor_y = 0
