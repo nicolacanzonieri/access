@@ -98,14 +98,10 @@ class DatabaseManager:
 
 if __name__ == "__main__":
     print(f"Default database path: {DEFAULT_DB_PATH}")
-    # You might want to delete the .db file before each test to start from scratch
-    # if os.path.exists(DEFAULT_DB_PATH):
-    #     os.remove(DEFAULT_DB_PATH)
+    if os.path.exists(DEFAULT_DB_PATH):
+        os.remove(DEFAULT_DB_PATH)
 
-    db_manager = (
-        DatabaseManager()
-    )  # This will call __init__ and thus _create_tables_if_not_exists
+    db_manager = DatabaseManager()
     print(
-        f"DatabaseManager initialized. The database file should be at: {db_manager.db_path}"
+        f"DatabaseManager initialized. The database file is located at: {db_manager.db_path}"
     )
-    print("Check if the .db file has been created and contains the correct tables.")
