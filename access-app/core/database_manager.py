@@ -118,7 +118,7 @@ class DatabaseManager:
             print(f"ERROR: SQLite error during table creation:\n{e}")
             raise
 
-    def _check_db_filename(self, filename: str) -> Optional[bool]:
+    def _check_filename_in_db(self, filename: str) -> Optional[bool]:
         """
         Checks if a given stored filename already exists in the Documents table.
 
@@ -148,6 +148,39 @@ class DatabaseManager:
         except sqlite3.Error as e:
             print(
                 f"ERROR: An error occurred while looking for a taken filename in the database:\n{e}"
+            )
+            return None
+
+    def _check_tag_in_db(self, tag: str) -> Optional[bool]:
+        """
+        Checks if a given tag already exists in the Tags table.
+
+        Args:
+            tag: The stored filename to check.
+
+        Returns:
+            True if the tag exists, False if it doesn't, and None if
+            a database error occurred.
+        """
+        sql_select = """
+            SELECT 1 FROM Tags WHERE tag_text = ? LIMIT 1;"
+        """
+
+        # Check if the given filename is inside the database
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    sql_select,
+                    (tag,),
+                )
+                return (
+                    cursor.fetchone()
+                    is not None  # True if filename exists in the database
+                )
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: An error occurred while looking for a tag in the database:\n{e}"
             )
             return None
 
@@ -188,7 +221,7 @@ class DatabaseManager:
         max_attempts = 5
         for attempt in range(max_attempts):
             generated_filename = self._generate_unique_filename(original_filename)
-            is_filename_taken = self._check_db_filename(generated_filename)
+            is_filename_taken = self._check_filename_in_db(generated_filename)
             if is_filename_taken is not None and not is_filename_taken:
                 stored_filename = generated_filename
                 break
@@ -215,6 +248,59 @@ class DatabaseManager:
             print(
                 f"ERROR: SQLite error while adding document '{original_filename}':\n{e}"
             )
+            return None
+
+    def get_or_create_tag(self, tag: str) -> Optional[int]:
+        """
+        Create a new tag to the Tags table if it doesn't already exist.
+        If the tag exists, its tag_id is returned. (Get-or-create pattern)
+
+        Args:
+            tag_text: The text of the tag.
+
+        Returns:
+            The tag_id of the tag (newly created or existing), or None on error.
+        """
+        sql_insert = """
+            INSERT INTO Tags (tag_text)
+            VALUES (?);
+        """
+        sql_select_id = "SELECT tag_id FROM Tags WHERE tag_text = ?;"
+
+        is_tag_in_db = self._check_tag_in_db(tag)
+
+        if is_tag_in_db:
+            try:
+                with self._get_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(sql_select_id, (tag,))
+                    row = cursor.fetchone()
+                    if row:
+                        return row[0]  # Returns the ID of the existing tag
+                    else:
+                        # This case is strange: _check_tag_in_db reported that it exists,
+                        # but now we can't find it. It could be a race condition
+                        # very rare or a logical error.
+                        print(
+                            f"ERROR: Tag '{tag}' reported as existing but not found when fetching ID."
+                        )
+                        return None
+            except sqlite3.Error as e:
+                print(
+                    f"ERROR: SQLite error while fetching ID for existing tag '{tag}':\n{e}"
+                )
+                return None
+        elif not is_tag_in_db:
+            try:
+                with self._get_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(sql_insert, (tag,))
+                    conn.commit()
+                    return cursor.lastrowid
+            except sqlite3.Error as e:
+                print(f"ERROR: SQLite error while adding tag '{tag}':\n{e}")
+                return None
+        elif is_tag_in_db is None:
             return None
 
 
