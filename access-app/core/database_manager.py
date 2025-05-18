@@ -22,8 +22,8 @@ class DatabaseManager:
         if not os.path.exists(db_dir):
             try:
                 os.makedirs(db_dir, exist_ok=True)
-            except OSError as error:
-                print(f"Error while creating database directory:\n{error}")
+            except OSError as e:
+                print(f"Error while creating database directory:\n{e}")
 
         # Initialize SQLite tables
         self._create_table()
