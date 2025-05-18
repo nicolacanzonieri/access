@@ -23,7 +23,4 @@ line-length = 88
 profile = "black"
 line_length = 88
 
-[tool.flake8]
-max-line-length = 88
-
 [tool.mypy]
