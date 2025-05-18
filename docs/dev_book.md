@@ -1,38 +1,3 @@
-# ACCESS v3 - Project Status and Development Guidelines
-
-This document describes the current status of the ACCESS v3 project, the architectural decisions made, and directions for future development. It is intended as a guide for collaborators who wish to contribute to the project.
-
-## Project Goal
-
-ACCESS (Automated Cataloging and Classification Engine for Storage and Search) aims to become a powerful and flexible tool for cataloging, classifying, and searching documents. Version 3 focuses on:
-
-1.  **Professional Code Quality:** Adoption of coding standards, linting, formatting, and static typing.
-2.  **Scalability:** Ability to handle a large number of documents, from very small to very large (thousands or hundreds of thousands).
-3.  **Accuracy:** Continuous improvement of tagging and search algorithms.
-4.  **Modularity:** Design that allows easy replacement or evolution of key components.
-
-## Current Repository Structure (Summary)
-
-```
-access_v3/
-├── access-app/                # Main application source code
-│   ├── core/                  # Business logic (database_manager.py here)
-│   │   └── database_manager.py
-│   ├── io/                    # I/O interaction (to be defined)
-│   ├── utils/                 # Utilities (to be defined)
-│   ├── cli.py                 # Entry point and CLI logic (to be defined)
-│   └── __init__.py
-├── data/                      # Persistent data
-│   └── learned/               # Learned data (contains access_main.db)
-│       └── access_main.db     # SQLite database file (currently empty or with base schema)
-├── tests/                     # (Planned, to be created)
-├── .github/                   # (Planned, for CI with GitHub Actions)
-├── .gitignore
-├── LICENSE
-├── README.md
-├── pyproject.toml             # Project configuration and dependencies
-└── repo-to-txt.sh             # Utility script to generate project tree
-```
 
 **Key Files and Decisions:**
 
@@ -64,11 +29,12 @@ access_v3/
     *   **Responsibility:** Encapsulate all interaction with SQLite (connections, SQL execution, schema creation). Provide a clean API to the rest of the application.
     *   **Current State of `database_manager.py`:**
         *   Definition of the database path (`DEFAULT_DB_PATH` pointing to `data/learned/access_main.db`).
-        *   `__init__` constructor that sets `self.db_path` and ensures the database directory exists.
-        *   Planned call to `_create_tables_if_not_exists()` in the constructor.
-        *   The `_create_tables_if_not_exists()` method has been defined and will contain `CREATE TABLE IF NOT EXISTS` queries for `Documents`, `Tags`, `DocumentTags`, and corresponding `CREATE INDEX IF NOT EXISTS`.
-        *   Planned `_get_connection()` helper method to centralize connection logic and enable `PRAGMA foreign_keys = ON;`.
-*   **SQLite Database Schema (Proposed):**
+        *   `__init__` constructor that sets `self.db_path`, ensures the database directory exists, and calls `_create_table()`.
+        *   `_create_table()` method implemented with `CREATE TABLE IF NOT EXISTS` queries for `Documents`, `Tags`, `DocumentTags`, and corresponding `CREATE INDEX IF NOT EXISTS`.
+        *   `_get_connection()` helper method implemented to centralize connection logic and enable `PRAGMA foreign_keys = ON;`.
+        *   Helper methods `_check_db_filename()` and `_generate_unique_filename()` implemented.
+        *   CRUD Method `add_document()` implemented, including logic for generating a unique `stored_filename` with collision detection.
+*   **SQLite Database Schema (Implemented):**
     *   **`Documents`**: `doc_id` (PK), `original_filename`, `stored_filename` (UNIQUE), `import_date`, `doc_length`.
     *   **`Tags`**: `tag_id` (PK), `tag_text` (UNIQUE).
     *   **`DocumentTags`**: `doc_id` (FK), `tag_id` (FK), `tf_idf_score` (REAL). `PRIMARY KEY (doc_id, tag_id)`. `ON DELETE CASCADE` for foreign keys.
@@ -109,25 +75,25 @@ access_v3/
 
 ## Immediate Next Steps (Contributor Guide)
 
-1.  **Complete `DatabaseManager._create_table()`:**
-    *   Implement `CREATE TABLE IF NOT EXISTS` SQL queries for `Documents`, `Tags`, `DocumentTags`.
-    *   Implement `CREATE INDEX IF NOT EXISTS` queries as discussed.
-    *   Ensure correct use of the context manager `with self._get_connection() as conn:`.
-    *   Test initialization (creation of the `.db` file and schema).
-2.  **Implement Basic CRUD Methods in `DatabaseManager`:**
-    *   `add_document(...)`
-    *   `add_tag_if_not_exists(...)` (get-or-create)
-    *   `link_document_tag(...)`
-    *   `get_tag_id(...)`
-    *   `get_document_id_by_stored_filename(...)`
-    *   `remove_document_and_its_tags(...)`
-3.  **Implement Support Methods for TF-IDF in `DatabaseManager`:**
-    *   `get_total_documents_count()`
-    *   `get_doc_count_for_tag(tag_id)`
-    *   `get_doc_length(doc_id)`
-4.  **Develop `DocumentProcessor` (Custom NLP Logic):**
+1.  **Complete `DatabaseManager` CRUD Methods (CREATE):**
+    *   **Done:** `add_document(...)`
+    *   **To Do:** `add_tag_if_not_exists(tag_text: str) -> Optional[int]` (get-or-create pattern).
+    *   **To Do:** `link_document_tag(doc_id: int, tag_id: int, tf_idf_score: Optional[float] = None) -> bool`.
+2.  **Implement Basic CRUD Methods (READ) in `DatabaseManager`:**
+    *   `get_tag_id(tag_text: str) -> Optional[int]`
+    *   `get_document_id_by_stored_filename(stored_filename: str) -> Optional[int]`
+    *   (Consider altri metodi GET che potrebbero servire, es. `get_document_by_id`, `get_tag_by_id`, `get_tags_for_document`, `get_documents_for_tag`).
+3.  **Implement Basic CRUD Methods (DELETE) in `DatabaseManager`:**
+    *   `remove_document_and_its_tags(doc_id: int) -> bool` (o per `stored_filename`).
+    *   (Considerare `remove_tag_from_document` o `remove_tag_globally`).
+4.  **Implement Support Methods for TF-IDF in `DatabaseManager`:**
+    *   `get_total_documents_count() -> int`
+    *   `get_doc_count_for_tag(tag_id: int) -> int`
+    *   `get_doc_length(doc_id: int) -> Optional[int]`
+    *   `update_tf_idf_score(doc_id: int, tag_id: int, score: float) -> bool` (Questo è un metodo UPDATE).
+5.  **Develop `DocumentProcessor` (Custom NLP Logic):**
     *   Functions for tokenizing, cleaning punctuation, converting to lowercase, removing stop-words (user-defined), lemmatizing (according to custom rules).
-5.  **Develop `TagExtractor`:**
+6.  **Develop `TagExtractor`:**
     *   Takes the output of `DocumentProcessor` and calculates term frequencies (TF) for the document.
 
 ## Areas to Be Defined/Developed Later
@@ -146,4 +112,4 @@ access_v3/
 *   Ensure you have the development tools installed (see `pyproject.toml` `[project.optional-dependencies].dev` section).
 *   Follow the code style enforced by `black` and `flake8` (will be automated with pre-commit).
 *   Write tests for new features.
-*   Keep this document updated with new decisions made.
+*   Keep this document (`dev_book.md`) updated with new decisions made.
