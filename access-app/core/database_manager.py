@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import uuid
 from typing import Optional
 
 PROJECT_ROOT_DIR: str = os.path.abspath(
@@ -23,7 +24,9 @@ class DatabaseManager:
             try:
                 os.makedirs(db_dir, exist_ok=True)
             except OSError as e:
-                print(f"Error while creating database directory:\n{e}")
+                print(
+                    f"ERROR: An error occurred while creating database directory:\n{e}"
+                )
 
         # Initialize SQLite tables
         self._create_table()
@@ -88,12 +91,87 @@ class DatabaseManager:
                 cursor.execute(
                     "CREATE INDEX IF NOT EXISTS idx_stored_filename_on_documents ON Documents (stored_filename);"
                 )
-
         except sqlite3.Error as e:
-            print(f"SQLite error during table creation: {e}")
-            # Consider whether propagating the exception is appropriate here
-            # if table creation is a critical failure for the application.
+            print(f"ERROR: SQLite error during table creation:\n{e}")
             raise
+
+    def _check_db_filename(self, filename: str) -> Optional[bool]:
+        sql_select = """
+            SELECT 1 FROM Documents WHERE stored_filename = ? LIMIT 1;"
+        """
+
+        # Check if the given filename is inside the database
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    sql_select,
+                    (filename,),
+                )
+                return (
+                    cursor.fetchone() is not None
+                )  # True if filename exists in the database
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: An error occurred while looking for a taken filename in the database:\n{e}"
+            )
+            return None
+
+    def _generate_unique_filename(self, filename: str) -> str:
+        _, ext = os.path.splitext(filename)  # Get the extension of the given file
+        return str(uuid.uuid4().hex) + ext  # Return a unique filename
+
+    def add_document(self, original_filename: str, doc_length: int) -> Optional[int]:
+        """
+        Adds a new document to the Documents table.
+        A unique stored_filename (UUID + extension) is generated internally.
+
+        Args:
+            original_filename: The original name of the document file.
+            doc_length: The length of the document.
+
+        Returns:
+            The doc_id of the newly added document, or None if the document
+            could not be added.
+        """
+        sql_insert = """
+            INSERT INTO Documents (original_filename, stored_filename, doc_length)
+            VALUES (?, ?, ?);
+        """
+
+        # Generate a unique filename for the document in the database. This filename
+        # is generated at maximum 5 times before giving up
+        stored_filename: str = ""
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            generated_filename = self._generate_unique_filename(original_filename)
+            is_filename_taken = self._check_db_filename(generated_filename)
+            if is_filename_taken is not None and not is_filename_taken:
+                break
+            elif attempt == max_attempts - 1:
+                print("ERROR: generated 5 not unique filenames for the document!")
+                return None
+
+        # Insert the document in the database
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    sql_insert,
+                    (original_filename, stored_filename, doc_length),
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError as e:
+            print(
+                f"ERROR: Cannot add document. 'stored_filename' ({stored_filename}) already exists:\n{e}"
+            )
+            return None
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: SQLite error while adding document '{original_filename}':\n{e}"
+            )
+            return None
 
 
 if __name__ == "__main__":
