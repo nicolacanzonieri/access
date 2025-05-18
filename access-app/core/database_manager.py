@@ -12,9 +12,21 @@ DEFAULT_DB_PATH: str = os.path.join(
 
 
 class DatabaseManager:
+    """
+    Manages the SQLite database for storing document and tag information.
+    Handles database connection, table creation, and basic document operations.
+    """
+
     db_path: str
 
-    def __init__(self, db_path: Optional[str] = None):
+    def __init__(self, db_path: Optional[str] = None) -> None:
+        """
+        Initializes the DatabaseManager.
+
+        Args:
+            db_path: Optional path to the SQLite database file.
+                     If None, the default path is used.
+        """
         # Use given db_path if not None, otherwise use the default one
         self.db_path = db_path if db_path is not None else DEFAULT_DB_PATH
 
@@ -32,11 +44,22 @@ class DatabaseManager:
         self._create_table()
 
     def _get_connection(self) -> sqlite3.Connection:
+        """
+        Establishes and returns a connection to the SQLite database.
+        Ensures foreign key support is enabled.
+
+        Returns:
+            A sqlite3.Connection object.
+        """
         conn = sqlite3.connect(self.db_path)
         conn.execute("PRAGMA foreign_keys = ON;")
         return conn
 
-    def _create_table(self):
+    def _create_table(self) -> None:
+        """
+        Creates the necessary tables (Documents, Tags, DocumentTags)
+        in the database if they do not already exist. Also creates relevant indices.
+        """
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
@@ -96,6 +119,16 @@ class DatabaseManager:
             raise
 
     def _check_db_filename(self, filename: str) -> Optional[bool]:
+        """
+        Checks if a given stored filename already exists in the Documents table.
+
+        Args:
+            filename: The stored filename to check.
+
+        Returns:
+            True if the filename exists, False if it doesn't, and None if
+            a database error occurred.
+        """
         sql_select = """
             SELECT 1 FROM Documents WHERE stored_filename = ? LIMIT 1;"
         """
@@ -119,6 +152,15 @@ class DatabaseManager:
             return None
 
     def _generate_unique_filename(self, filename: str) -> str:
+        """
+        Generates a unique filename using UUID, preserving the original file extension.
+
+        Args:
+            filename: The original filename to extract the extension from.
+
+        Returns:
+            A unique string intended for use as a stored filename.
+        """
         _, ext = os.path.splitext(filename)  # Get the extension of the given file
         return str(uuid.uuid4().hex) + ext  # Return a unique filename
 
