@@ -109,8 +109,9 @@ class DatabaseManager:
                     (filename,),
                 )
                 return (
-                    cursor.fetchone() is not None
-                )  # True if filename exists in the database
+                    cursor.fetchone()
+                    is not None  # True if filename exists in the database
+                )
         except sqlite3.Error as e:
             print(
                 f"ERROR: An error occurred while looking for a taken filename in the database:\n{e}"
