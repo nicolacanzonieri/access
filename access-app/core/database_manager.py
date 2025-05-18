@@ -97,15 +97,15 @@ class DatabaseManager:
 
 
 if __name__ == "__main__":
-    print(f"Percorso database di default: {DEFAULT_DB_PATH}")
-    # Potresti voler cancellare il file .db prima di ogni test per partire da zero
+    print(f"Default database path: {DEFAULT_DB_PATH}")
+    # You might want to delete the .db file before each test to start from scratch
     # if os.path.exists(DEFAULT_DB_PATH):
     #     os.remove(DEFAULT_DB_PATH)
 
     db_manager = (
         DatabaseManager()
-    )  # Questo chiamerà __init__ e quindi _create_tables_if_not_exists
+    )  # This will call __init__ and thus _create_tables_if_not_exists
     print(
-        f"DatabaseManager inizializzato. Il file database dovrebbe essere in: {db_manager.db_path}"
+        f"DatabaseManager initialized. The database file should be at: {db_manager.db_path}"
     )
-    print("Controlla se il file .db è stato creato e contiene le tabelle corrette.")
+    print("Check if the .db file has been created and contains the correct tables.")
