@@ -1,0 +1,29 @@
+[project]
+name = "access"
+version = "3.0.0"
+description = "Automated Cataloging and Classification Engine for Storage and Search"
+requires-python = ">=3.8"
+
+[dependencies]
+
+[project.optional-dependencies]
+dev = [
+    "black",    # Formatter
+    "flake8",   # Linter
+    "isort",
+    "mypy",
+    "pre-commit",
+    "pytest",
+]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.flake8]
+max-line-length = 88
+
+[tool.mypy]

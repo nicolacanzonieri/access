@@ -1,0 +1,38 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0 # Use the latest stable version, check on GitHub
+    hooks:
+      - id: trailing-whitespace # Removes trailing whitespace
+      - id: end-of-file-fixer # Ensures files end with a newline
+      - id: check-yaml # Checks YAML file syntax
+      - id: check-toml # Checks TOML file syntax (like pyproject.toml)
+      - id: check-added-large-files # Prevents committing large files
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2 # Use the latest stable version
+    hooks:
+      - id: black
+        # language_version: python3.8 # You can specify the version if needed
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2 # Use the latest stable version
+    hooks:
+      - id: isort
+        # args: ["--profile", "black"] # isort should read the profile from pyproject.toml
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0 # Use the latest stable version
+    hooks:
+      - id: flake8
+        # additional_dependencies:
+        #   - flake8-bugbear  # If you want to include specific plugins
+        #   - flake8-docstrings
+#   - repo: https://github.com/pre-commit/mirrors-mypy
+#     rev: v1.10.0 # Use the latest stable version
+#     hooks:
+#       - id: mypy
+#         args: [--config-file=pyproject.toml] # Tells mypy to read the config from pyproject.toml
+#         # If you have external libraries that need type stubs, add them here:
+#         additional_dependencies: []
+# # "types-requests", # Example if you were using 'requests'

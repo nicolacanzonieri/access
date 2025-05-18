@@ -1,0 +1,7 @@
+venv
+access.egg-info
+build
+check.sh
+repo-to-txt.sh
+repo-to-txt.py
+repo_txt.txt
