@@ -190,6 +190,7 @@ class DatabaseManager:
             generated_filename = self._generate_unique_filename(original_filename)
             is_filename_taken = self._check_db_filename(generated_filename)
             if is_filename_taken is not None and not is_filename_taken:
+                stored_filename = generated_filename
                 break
             elif attempt == max_attempts - 1:
                 print("ERROR: generated 5 not unique filenames for the document!")
