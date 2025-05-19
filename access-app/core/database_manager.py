@@ -102,7 +102,7 @@ class DatabaseManager:
         If the tag exists, its tag_id is returned. (Get-or-create pattern)
 
         Args:
-            tag_text: The text of the tag.
+            tag: The text of the tag.
 
         Returns:
             The tag_id of the tag (newly created or existing), or None on error.
@@ -148,6 +148,60 @@ class DatabaseManager:
                 return None
         elif is_tag_in_db is None:
             return None
+
+    def link_document_tag(
+        self,
+        doc_id: int,
+        tag_id: int,
+        tf_idf_score: Optional[float] = None,  # Consistency with column name
+    ) -> bool:
+        """
+        Links a document to a tag in the DocumentTags table.
+        If the link already exists, the operation is still considered successful
+        (as the link is present). An optional TF-IDF score can be provided.
+
+        Args:
+            doc_id: The ID of the document.
+            tag_id: The ID of the tag.
+            tf_idf_score: Optional TF-IDF score for the document-tag association.
+
+        Returns:
+            True if the link was successfully created or already existed without error,
+            False if a foreign key constraint was violated or another SQLite error occurred.
+        """
+        # If the pair (doc_id, tag_id) already exists, IGNORE prevents the error.
+        # If doc_id or tag_id do not exist in the referenced tables, IntegrityError will be raised (FK violation).
+        sql = """
+            INSERT OR IGNORE INTO DocumentTags (doc_id, tag_id, tf_idf_score)
+            VALUES (?, ?, ?);
+        """
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql, (doc_id, tag_id, tf_idf_score))
+                conn.commit()
+                # If rowcount is 0 and there are no errors, it means the link already existed.
+                if cursor.rowcount > 0:
+                    print(
+                        f"INFO: Link created between doc_id {doc_id} and tag_id {tag_id}."
+                    )
+                else:
+                    print(
+                        f"INFO: Link between doc_id {doc_id} and tag_id {tag_id} already existed or no change made."
+                    )
+                return True
+        except sqlite3.IntegrityError as e:
+            # With INSERT OR IGNORE, this error is most likely due to a FOREIGN KEY violation.
+            print(
+                f"ERROR: Failed to link doc_id {doc_id} with tag_id {tag_id}. "
+                f"This is likely due to a non-existent doc_id or tag_id (Foreign Key violation): {e}"
+            )
+            return False
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: SQLite error linking doc_id {doc_id} with tag_id {tag_id}: {e}"
+            )
+            return False
 
     def _get_connection(self) -> sqlite3.Connection:
         """
@@ -199,7 +253,7 @@ class DatabaseManager:
                     CREATE TABLE IF NOT EXISTS DocumentTags (
                         doc_id INTEGER NOT NULL,
                         tag_id INTEGER NOT NULL,
-                        tf_idf_score REAL,
+                        score REAL,
                         PRIMARY KEY (doc_id, tag_id),
                         FOREIGN KEY (doc_id) REFERENCES Documents(doc_id) ON DELETE CASCADE,
                         FOREIGN KEY (tag_id) REFERENCES Tags(tag_id) ON DELETE CASCADE
