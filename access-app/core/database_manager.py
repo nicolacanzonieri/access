@@ -149,6 +149,34 @@ class DatabaseManager:
         elif is_tag_in_db is None:
             return None
 
+    def get_tag_id_by_text(self, tag_text: str) -> Optional[int]:
+        """
+        Retrieves the ID of a tag given its text.
+
+        Args:
+            tag_text: The text of the tag to look up.
+
+        Returns:
+            The integer tag_id if found, or None if the tag does not exist
+            or a database error occurs.
+        """
+        sql_select = "SELECT tag_id FROM Tags WHERE tag_text = ?;"
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_select, (tag_text,))
+                row = cursor.fetchone()
+                if row:
+                    return row[0]  # Returns the ID of the existing tag
+                else:
+                    print(f"INFO: Tag '{tag_text}' not found")
+                    return None
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: SQLite error while trying to retrieve tag_id for tag '{tag_text}':\n{e}"
+            )
+            return None
+
     def link_document_tag(
         self,
         doc_id: int,
