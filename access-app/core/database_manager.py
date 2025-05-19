@@ -181,17 +181,17 @@ class DatabaseManager:
         self,
         doc_id: int,
         tag_id: int,
-        tf_idf_score: Optional[float] = None,  # Consistency with column name
+        score: Optional[float] = None,  # Consistency with column name
     ) -> bool:
         """
         Links a document to a tag in the DocumentTags table.
         If the link already exists, the operation is still considered successful
-        (as the link is present). An optional TF-IDF score can be provided.
+        (as the link is present). An optional score can be provided.
 
         Args:
             doc_id: The ID of the document.
             tag_id: The ID of the tag.
-            tf_idf_score: Optional TF-IDF score for the document-tag association.
+            score: Optional score for the document-tag association.
 
         Returns:
             True if the link was successfully created or already existed without error,
@@ -200,13 +200,13 @@ class DatabaseManager:
         # If the pair (doc_id, tag_id) already exists, IGNORE prevents the error.
         # If doc_id or tag_id do not exist in the referenced tables, IntegrityError will be raised (FK violation).
         sql = """
-            INSERT OR IGNORE INTO DocumentTags (doc_id, tag_id, tf_idf_score)
+            INSERT OR IGNORE INTO DocumentTags (doc_id, tag_id, score)
             VALUES (?, ?, ?);
         """
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (doc_id, tag_id, tf_idf_score))
+                cursor.execute(sql, (doc_id, tag_id, score))
                 conn.commit()
                 # If rowcount is 0 and there are no errors, it means the link already existed.
                 if cursor.rowcount > 0:
