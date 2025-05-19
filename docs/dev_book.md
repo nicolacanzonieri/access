@@ -31,11 +31,13 @@
     *   **Current State of `database_manager.py`:**
         *   Definition of the database path (`DEFAULT_DB_PATH` pointing to `data/learned/access_main.db`).
         *   `__init__` constructor that sets `self.db_path`, ensures the database directory exists, and calls `_create_table()`.
-        *   `_create_table()` method implemented with `CREATE TABLE IF NOT EXISTS` queries for `Documents`, `Tags`, `DocumentTags`, and corresponding `CREATE INDEX IF NOT EXISTS`.
+        *   `_create_table()` method implemented with `CREATE TABLE IF NOT EXISTS` queries for `Documents`, `Tags`, `DocumentTags` (with `tf_idf_score` column), and corresponding `CREATE INDEX IF NOT EXISTS`.
         *   `_get_connection()` helper method implemented to centralize connection logic and enable `PRAGMA foreign_keys = ON;`.
         *   Helper methods `_check_filename_in_db()`, `_check_tag_in_db()`, and `_generate_unique_filename()` implemented.
-        *   CRUD Method `add_document()` implemented, including logic for generating a unique `stored_filename` with collision detection.
-        *   CRUD Method `get_or_create_tag()` implemented (get-or-create pattern for tags).
+        *   CRUD Method `add_document()` implemented.
+        *   CRUD Method `get_or_create_tag()` implemented.
+        *   CRUD Method `link_document_tag()` implemented.
+        *   CRUD Method `get_tag_id_by_text()` implemented.
 *   **SQLite Database Schema (Implemented):**
     *   **`Documents`**: `doc_id` (PK), `original_filename`, `stored_filename` (UNIQUE), `import_date`, `doc_length`.
     *   **`Tags`**: `tag_id` (PK), `tag_text` (UNIQUE).
@@ -79,11 +81,11 @@
 
 1.  **Complete `DatabaseManager` CRUD Methods (CREATE):**
     *   **Done:** `add_document(original_filename: str, doc_length: int) -> Optional[int]`
-    *   **Done:** `get_or_create_tag(tag: str) -> Optional[int]` (implements get-or-create pattern).
-    *   **To Do:** `link_document_tag(doc_id: int, tag_id: int, tf_idf_score: Optional[float] = None) -> bool`.
+    *   **Done:** `get_or_create_tag(tag: str) -> Optional[int]`
+    *   **Done:** `link_document_tag(doc_id: int, tag_id: int, tf_idf_score: Optional[float] = None) -> bool`.
 2.  **Implement Basic CRUD Methods (READ) in `DatabaseManager`:**
-    *   `get_tag_id_by_text(tag_text: str) -> Optional[int]` (Note: `get_or_create_tag` can serve part of this, but a dedicated GET might be cleaner for some use cases).
-    *   `get_document_id_by_stored_filename(stored_filename: str) -> Optional[int]`
+    *   **Done:** `get_tag_id_by_text(tag_text: str) -> Optional[int]`.
+    *   **To Do:** `get_document_id_by_stored_filename(stored_filename: str) -> Optional[int]`
     *   (Consider other GET methods that might be needed, e.g., `get_document_by_id`, `get_tag_by_id`, `get_tags_for_document`, `get_documents_for_tag`).
 3.  **Implement Basic CRUD Methods (DELETE) in `DatabaseManager`:**
     *   `remove_document(doc_id: int) -> bool` (or by `stored_filename`). This will also remove associated tags via `ON DELETE CASCADE`.
