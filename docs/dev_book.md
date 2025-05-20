@@ -83,10 +83,11 @@
     *   **Done:** `add_document(original_filename: str, doc_length: int) -> Optional[int]`
     *   **Done:** `get_or_create_tag(tag: str) -> Optional[int]`
     *   **Done:** `link_document_tag(doc_id: int, tag_id: int, tf_idf_score: Optional[float] = None) -> bool`.
-2.  **Implement Basic CRUD Methods (READ) in `DatabaseManager`:**
-    *   **Done:** `get_tag_id_by_text(tag_text: str) -> Optional[int]`.
-    *   **To Do:** `get_document_id_by_stored_filename(stored_filename: str) -> Optional[int]`
-    *   (Consider other GET methods that might be needed, e.g., `get_document_by_id`, `get_tag_by_id`, `get_tags_for_document`, `get_documents_for_tag`).
+    2.  **Implement Basic CRUD Methods (READ) in `DatabaseManager`:**
+        *   **Done:** `get_tag_id_by_text(tag_text: str) -> Optional[int]`.
+        *   **Done:** `get_document_id_by_stored_filename(stored_filename: str) -> Optional[int]`
+        *   **Done:** `get_document_by_id(doc_id: int) -> Optional[dict]`
+        *   **(Consider other GET methods that might be needed, e.g., `get_tag_by_id`, `get_tags_for_document`, `get_documents_for_tag`).**
 3.  **Implement Basic CRUD Methods (DELETE) in `DatabaseManager`:**
     *   `remove_document(doc_id: int) -> bool` (or by `stored_filename`). This will also remove associated tags via `ON DELETE CASCADE`.
     *   (Consider `unlink_document_tag(doc_id: int, tag_id: int) -> bool` or `remove_tag_globally(tag_id: int) -> bool`).

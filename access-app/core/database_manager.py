@@ -96,6 +96,67 @@ class DatabaseManager:
             )
             return None
 
+    def get_document_id_by_stored_filename(self, stored_filename: str) -> Optional[int]:
+        """
+        Retrieves the ID of a document given its filename inside the database.
+
+        Args:
+            stored_filename: The filename of the document inside the database
+
+        Returns:
+            The integer document_id if found, or None if the document does not exist
+            or a database error occurs.
+        """
+        sql_select = "SELECT doc_id FROM Documents WHERE stored_filename = ?;"
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_select, (stored_filename,))
+                row = cursor.fetchone()
+                if row:
+                    return row[0]  # Returns the ID of the existing document
+                else:
+                    print(f"INFO: Document '{stored_filename}' not found")
+                    return None
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: SQLite error while trying to retrieve doc_id for stored_filename '{stored_filename}':\n{e}"
+            )
+            return None
+
+    def get_document_by_id(self, doc_id: int) -> Optional[dict]:
+        """
+        Retrieves all details of a document given its ID.
+
+        Args:
+            doc_id: The ID of the document to retrieve.
+
+        Returns:
+            A dictionary containing the document's details (column_name: value)
+            if found, or None if the document does not exist or a database
+            error occurs.
+        """
+        sql_select = "SELECT doc_id, original_filename, stored_filename, import_date, doc_length FROM Documents WHERE doc_id = ?;"
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_select, (doc_id,))
+                row = cursor.fetchone()
+                if row:
+                    column_names = [
+                        description[0] for description in cursor.description
+                    ]
+                    document_details: dict = dict(zip(column_names, row))
+                    return document_details
+                else:
+                    print(f"INFO: Document with id '{doc_id}' not found")
+                    return None
+        except sqlite3.Error as e:
+            print(
+                f"ERROR: SQLite error while trying to retrieve document for doc_id '{doc_id}':\n{e}"
+            )
+            return None
+
     def get_or_create_tag(self, tag: str) -> Optional[int]:
         """
         Create a new tag to the Tags table if it doesn't already exist.
